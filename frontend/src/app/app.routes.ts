@@ -4,11 +4,13 @@ import { Home } from './home/home';
 import { I18n } from './i18n/i18n';
 import { Language, languagePrefix } from './i18n/languages';
 import { NotFound } from './not-found/not-found';
+import { SiteLayout } from './site-layout/site-layout';
 
 // The same pages under each language's prefix. Add new pages here.
 function languageRoutes(language: Language): Route {
   return {
     path: languagePrefix(language),
+    component: SiteLayout,
     resolve: { messages: () => inject(I18n).use(language) },
     children: [
       {
@@ -30,6 +32,11 @@ function languageRoutes(language: Language): Route {
 
 export const routes: Routes = [
   { path: 'lv', pathMatch: 'full', redirectTo: '/' },
+  {
+    path: 'admin',
+    data: { admin: true },
+    loadChildren: () => import('./admin/admin.routes').then((m) => m.adminRoutes),
+  },
   languageRoutes('ru'),
   languageRoutes('en'),
   // Last: no prefix, so it also takes every other URL

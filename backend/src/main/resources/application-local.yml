@@ -2,5 +2,17 @@
 
 spring:
   config:
-    # Database settings from the .env in the repository root. Backend runs from backend/.
+    # Database and admin settings from the .env in the repository root. Backend runs from backend/.
     import: optional:file:../.env[.properties]
+
+app:
+  bootstrap-admin:
+    # The local password stays the one in .env, also after resetting the database
+    password-change-required: false
+
+server:
+  servlet:
+    session:
+      cookie:
+        # Allows the session cookie over plain http://localhost
+        secure: false

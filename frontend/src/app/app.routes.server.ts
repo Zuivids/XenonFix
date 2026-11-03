@@ -2,6 +2,8 @@ import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
   { path: 'lv', renderMode: RenderMode.Server, status: 301 },
+  // Rendered in the browser: the panel has nothing to index and needs the login cookie
+  { path: 'admin/**', renderMode: RenderMode.Client },
   { path: '', renderMode: RenderMode.Server },
   { path: 'ru', renderMode: RenderMode.Server },
   { path: 'en', renderMode: RenderMode.Server },

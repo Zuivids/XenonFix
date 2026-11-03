@@ -32,7 +32,14 @@ if [ ! -f .env ]; then
   echo "Creating .env with random local passwords..."
   sed -e "s/^DB_PASSWORD=.*/DB_PASSWORD=$(random)/" \
       -e "s/^DB_ROOT_PASSWORD=.*/DB_ROOT_PASSWORD=$(random)/" \
+      -e "s/^APP_ADMIN_PASSWORD=.*/APP_ADMIN_PASSWORD=$(random)/" \
       .env.example > .env
+fi
+
+# A .env from before the admin login: add the local admin
+if ! grep -q '^APP_ADMIN_PASSWORD=' .env; then
+  echo "Adding a local admin to .env..."
+  printf '\nAPP_ADMIN_EMAIL=admin@xenonfix.test\nAPP_ADMIN_PASSWORD=%s\n' "$(random)" >> .env
 fi
 
 mkdir -p logs
@@ -68,6 +75,7 @@ cat <<EOF
 
 XenonFix is running
   Site:      http://localhost:4300  (also /ru and /en)
+  Admin:     http://localhost:4300/admin, login in .env
   Health:    http://localhost:8090/api/health
   Database:  localhost:3308, database xenonfix, login in .env
   Logs:      logs/backend.log, logs/frontend.log

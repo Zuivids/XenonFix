@@ -13,19 +13,11 @@ import lv.xenonfix.config.AppProperties;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-/** The full application against a real MariaDB container, the same version as compose.yaml. */
-@SpringBootTest
-@AutoConfigureMockMvc
-@ActiveProfiles("test")
-@Import(TestcontainersConfiguration.class)
+@IntegrationTest
 class XenonFixApplicationTests {
 
 	@Autowired
@@ -47,7 +39,7 @@ class XenonFixApplicationTests {
 			.query(String.class)
 			.single();
 
-		assertThat(version).isEqualTo("1");
+		assertThat(version).isEqualTo("2");
 		assertThat(legalName).isEqualTo("SIA Elekanga");
 	}
 

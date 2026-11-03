@@ -30,8 +30,18 @@ if not exist .env (
     "$r = { [guid]::NewGuid().ToString('N').Substring(0,24) };" ^
     "(Get-Content .env.example) -replace '^DB_PASSWORD=.*', ('DB_PASSWORD=' + (& $r))" ^
     " -replace '^DB_ROOT_PASSWORD=.*', ('DB_ROOT_PASSWORD=' + (& $r))" ^
+    " -replace '^APP_ADMIN_PASSWORD=.*', ('APP_ADMIN_PASSWORD=' + (& $r))" ^
     " | Set-Content -Encoding ascii .env"
   if errorlevel 1 (set "MSG=Could not create .env" & goto :fail)
+)
+
+rem A .env from before the admin login: add the local admin
+findstr /b /c:"APP_ADMIN_PASSWORD=" .env >nul 2>nul
+if errorlevel 1 (
+  echo Adding a local admin to .env...
+  powershell -NoProfile -Command ^
+    "Add-Content -Encoding ascii .env @('', 'APP_ADMIN_EMAIL=admin@xenonfix.test', ('APP_ADMIN_PASSWORD=' + [guid]::NewGuid().ToString('N').Substring(0,24)))"
+  if errorlevel 1 (set "MSG=Could not update .env" & goto :fail)
 )
 
 if not exist logs mkdir logs
@@ -80,6 +90,7 @@ if errorlevel 1 (set "MSG=Frontend did not start within 3 minutes. See logs\fron
 echo.
 echo XenonFix is running
 echo   Site:      http://localhost:4300  (also /ru and /en)
+echo   Admin:     http://localhost:4300/admin, login in .env
 echo   Health:    http://localhost:8090/api/health
 echo   Database:  localhost:3308, database xenonfix, login in .env
 echo   Logs:      logs\backend.log, logs\frontend.log

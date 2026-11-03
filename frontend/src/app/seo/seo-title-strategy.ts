@@ -26,6 +26,16 @@ export class SeoTitleStrategy extends TitleStrategy {
       route = route.firstChild;
     }
 
+    if (route.data['admin']) {
+      // Latvian only and not for search engines; its route titles are plain text
+      this.title.setTitle(route.title ?? 'XenonFix');
+      this.meta.removeTag('name="description"');
+      this.meta.updateTag({ name: 'robots', content: 'noindex' });
+      this.removeLinks();
+      return;
+    }
+
+    this.meta.removeTag('name="robots"');
     this.document.documentElement.setAttribute('lang', this.i18n.language());
     this.title.setTitle(this.i18n.t(route.title as MessageKey));
     this.meta.updateTag({
@@ -35,13 +45,16 @@ export class SeoTitleStrategy extends TitleStrategy {
     this.updateLinks(pagePath(snapshot.url));
   }
 
-  private updateLinks(page: string): void {
-    const head = this.document.head;
-    head
+  private removeLinks(): void {
+    this.document.head
       .querySelectorAll('link[rel="canonical"], link[rel="alternate"][hreflang]')
       .forEach((link) => link.remove());
+  }
 
-    const url = (language: Language) => SITE_URL + localizedPath(language, page);
+  private updateLinks(page: string): void {
+    this.removeLinks();
+
+    const url =(language: Language) => SITE_URL + localizedPath(language, page);
     this.addLink({ rel: 'canonical', href: url(this.i18n.language()) });
     for (const language of LANGUAGES) {
       this.addLink({ rel: 'alternate', hreflang: language, href: url(language) });

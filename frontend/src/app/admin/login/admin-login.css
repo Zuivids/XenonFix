@@ -1,0 +1,12 @@
+main {
+  max-width: 24rem;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+}
+
+img {
+  display: block;
+  width: auto;
+  height: 3rem;
+  margin-bottom: 2rem;
+}

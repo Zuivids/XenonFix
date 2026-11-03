@@ -26,12 +26,38 @@ spring:
 app:
   # Uploaded files stay on disk and the database holds their paths. Served at /uploads/**.
   uploads-path: ${APP_UPLOADS_PATH:./uploads}
+  # First admin, created at startup only while there are no admins. The others are added in
+  # the admin panel. This password must be changed at first login.
+  bootstrap-admin:
+    email: ${APP_ADMIN_EMAIL:}
+    password: ${APP_ADMIN_PASSWORD:}
+    password-change-required: true
+  lockout:
+    # Per account and client IP: an attacker blocks only their own address
+    max-failed-attempts-per-ip: 5
+    # Per account from all addresses: the backstop against guessing from many addresses
+    max-failed-attempts: 20
+    duration: 15m
+  # Requests per client IP to the login and password change endpoints
+  rate-limit:
+    limit: 20
+    window: 1m
+  session:
+    idle: 30m
+    absolute: 8h
 
 server:
   port: ${SERVER_PORT:8090}
   error:
     include-stacktrace: never
     include-message: never
+  servlet:
+    session:
+      tracking-modes: cookie
+      cookie:
+        http-only: true
+        secure: true
+        same-site: strict
 
 logging:
   level:

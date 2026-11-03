@@ -23,6 +23,7 @@ If you delete `.env`, reset the database too, because it keeps the old password.
 | | Address |
 |---|---|
 | Site | http://localhost:4300 (`/ru`, `/en`) |
+| Admin panel | http://localhost:4300/admin, login in `.env` |
 | Backend health | http://localhost:8090/api/health |
 | Database | `localhost:3308`, database `xenonfix`, login in `.env` |
 | Logs | `logs/backend.log`, `logs/frontend.log` |
@@ -52,6 +53,24 @@ return DTOs, never database entities. Schema changes are Flyway migrations in
 Uploaded files stay on disk, in the folder set by `APP_UPLOADS_PATH`, and are served at
 `/uploads/**`. The database holds their paths.
 
+## Admin panel
+
+The panel is at `/admin`, in Latvian only, and is not indexed by search engines.
+
+- **First admin:** created at startup from `APP_ADMIN_EMAIL` and `APP_ADMIN_PASSWORD` while there
+  are no admins. After that these settings are ignored. Outside the `local` profile, the password
+  must be changed at first login.
+- **More admins:** an admin adds them in the panel with a temporary password. The panel can also
+  disable an admin and set a new temporary password for a forgotten one. Nobody can do either to
+  their own account, so one active admin always remains.
+- **Protection:** Argon2id password hashes, session cookie with CSRF protection, 30 minutes idle
+  and 8 hours absolute session time, blocks after repeated failures, and a request limit per IP.
+- **Audit log:** logins, password changes and changes to admins, in `audit_log`. Never write
+  passwords to it. Later features add their own event types.
+
+MFA is left out for now. To add it: create a table for the admins' secrets, make the login answer
+`MFA_REQUIRED` from `AuthService.login` (`LoginResponse.Status` is ready for it), and grant the
+admin authority only after the second step (`Authorities`).
 ## Languages
 
 Latvian is at the site root, as on the old site (`/`, later `/par-mums`). Russian and English
