@@ -17,8 +17,10 @@ import { LANGUAGE_NAMES, LANGUAGES, localizedPath, pagePath } from './languages'
           [routerLink]="link.path"
           [attr.hreflang]="link.language"
           [attr.lang]="link.language"
+          [attr.aria-label]="link.name"
+          [attr.title]="link.name"
           [attr.aria-current]="link.language === i18n.language() ? 'true' : null"
-        >{{ link.name }}</a>
+        >{{ link.language }}</a>
       }
     </nav>
   `,

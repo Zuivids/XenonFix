@@ -1,17 +1,23 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { I18n } from '../i18n/i18n';
-import { localizedPath } from '../i18n/languages';
+import { LocalizedPipe } from '../i18n/localized-link.pipe';
 
 @Component({
   selector: 'app-not-found',
-  imports: [RouterLink],
+  imports: [LocalizedPipe, RouterLink],
   template: `
-    <h1>{{ i18n.t('notFound.heading') }}</h1>
-    <p><a [routerLink]="home()">{{ i18n.t('notFound.backHome') }}</a></p>
+    <header class="page-head">
+      <div class="container">
+        <p class="eyebrow">404</p>
+        <h1>{{ t('notFound.heading') }}</h1>
+      </div>
+    </header>
+    <div class="container page-body">
+      <a class="button" [routerLink]="'/' | localized">{{ t('notFound.backHome') }}</a>
+    </div>
   `,
 })
 export class NotFound {
-  protected readonly i18n = inject(I18n);
-  protected readonly home = computed(() => localizedPath(this.i18n.language(), '/'));
+  protected readonly t = inject(I18n).t;
 }

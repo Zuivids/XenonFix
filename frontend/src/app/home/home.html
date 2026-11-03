@@ -1,0 +1,89 @@
+<section class="hero">
+  <div class="beam" aria-hidden="true"></div>
+  <div class="container hero-row">
+    <div class="hero-copy">
+      <p class="eyebrow">{{ t('home.eyebrow') }}</p>
+      <h1>{{ t('home.heading') }}</h1>
+      <p class="hero-intro">{{ t('home.intro') }}</p>
+      <div class="button-row">
+        <a class="button" [href]="info.phoneHref">{{ t('cta.call') }} {{ info.phone }}</a>
+        <a class="button secondary" [routerLink]="'/musu-pakalpojumi' | localized">{{ t('home.servicesHeading') }}</a>
+      </div>
+    </div>
+    <div class="hero-photo zoom">
+      <img
+        [src]="photos[4].src"
+        [alt]="t('home.photoAlt')"
+        [width]="photos[4].width"
+        [height]="photos[4].height"
+        fetchpriority="high"
+      />
+    </div>
+  </div>
+  <div class="container">
+    <dl class="stats">
+      <div>
+        <dt>{{ t('home.stat.experience') }}</dt>
+        <dd>10</dd>
+      </div>
+      <div>
+        <dt>{{ t('home.stat.warranty') }}</dt>
+        <dd>2</dd>
+      </div>
+      <div>
+        <dt>{{ t('home.stat.services') }}</dt>
+        <dd>{{ content().services.length }}</dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<section class="container section">
+  <p class="eyebrow reveal">{{ t('home.servicesEyebrow') }}</p>
+  <h2 class="section-title reveal">{{ t('home.servicesHeading') }}</h2>
+  <div class="bento">
+    @for (service of content().homeServices; track $index) {
+      <a
+        class="tile reveal"
+        [class.wide]="isWide($index)"
+        [routerLink]="'/musu-pakalpojumi' | localized"
+      >
+        <span class="tile-photo zoom">
+          <img
+            [src]="photos[$index].src"
+            alt=""
+            [width]="photos[$index].width"
+            [height]="photos[$index].height"
+            loading="lazy"
+          />
+        </span>
+        <span class="tile-text">
+          <span class="tile-title">{{ service.title }}</span>
+          <span class="tile-detail">{{ service.text }}</span>
+        </span>
+      </a>
+    }
+    <a class="tile tile-all reveal" [routerLink]="'/musu-pakalpojumi' | localized">
+      <span class="tile-all-count">{{ content().services.length }}</span>
+      <span class="tile-all-label">{{ t('home.allServices') }} <span aria-hidden="true">→</span></span>
+    </a>
+  </div>
+</section>
+
+<section class="container section">
+  <div class="advice reveal">
+    <div>
+      <h2>{{ t('home.ctaHeading') }}</h2>
+      <p class="lead">{{ t('home.ctaText') }}</p>
+      <div class="button-row">
+        <a class="button" [href]="info.phoneHref">{{ t('cta.call') }} {{ info.phone }}</a>
+        <a class="button secondary" [href]="info.whatsappHref" rel="noopener">{{ t('cta.whatsapp') }}</a>
+      </div>
+    </div>
+    <div class="advice-text">
+      @for (paragraph of content().homeReasons; track $index) {
+        <p>{{ paragraph }}</p>
+      }
+    </div>
+  </div>
+</section>

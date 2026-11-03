@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router, TitleStrategy } from '@angular/router';
 import { App } from './app';
-import { routes } from './app.routes';
+import { PAGE_PATHS, routes } from './app.routes';
 import { SeoTitleStrategy } from './seo/seo-title-strategy';
 
 async function appAt(url: string) {
@@ -11,8 +11,8 @@ async function appAt(url: string) {
   return fixture;
 }
 
-function hrefs(root: HTMLElement) {
-  return [...root.querySelectorAll('.language-switcher a')].map((a) => a.getAttribute('href'));
+function hrefs(root: HTMLElement, selector = '.language-switcher a') {
+  return [...root.querySelectorAll(selector)].map((a) => a.getAttribute('href'));
 }
 
 describe('App', () => {
@@ -24,15 +24,58 @@ describe('App', () => {
   });
 
   it.each([
-    ['/', 'lv', 'Lukturu remonts un pārdošana'],
-    ['/ru', 'ru', 'Ремонт и продажа фар'],
-    ['/en', 'en', 'Headlight repair and sales'],
+    ['/', 'lv', 'Auto priekšējo lukturu remonts'],
+    ['/ru', 'ru', 'Ремонт передних автомобильных фар'],
+    ['/en', 'en', 'Car headlight repair'],
   ])('renders %s in its language', async (url, language, heading) => {
     const root = (await appAt(url)).nativeElement as HTMLElement;
 
     expect(root.querySelector('h1')?.textContent).toBe(heading);
     expect(document.documentElement.getAttribute('lang')).toBe(language);
-    expect(root.querySelector('[aria-current]')?.getAttribute('hreflang')).toBe(language);
+    expect(root.querySelector('.language-switcher [aria-current]')?.getAttribute('hreflang')).toBe(language);
+  });
+
+  it.each(
+    PAGE_PATHS.flatMap((path) => [
+      [`/${path}`, `/ru/${path}`, `/en/${path}`].map((url) => [url] as const),
+    ]).flat(),
+  )('%s has a translated title, heading and description', async (url) => {
+    const root = (await appAt(url)).nativeElement as HTMLElement;
+
+    const heading = root.querySelector('h1')?.textContent ?? '';
+    expect(heading).not.toBe('');
+    expect(heading).not.toMatch(/^[a-z]+\.[a-zA-Z]+$/);
+    expect(document.title).toContain('XenonFix');
+    expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toBeTruthy();
+    expect(root.querySelector('main')?.textContent?.length).toBeGreaterThan(50);
+  });
+
+  it('links to the pages in the current language', async () => {
+    const root = (await appAt('/ru/kontakti')).nativeElement as HTMLElement;
+
+    expect(hrefs(root, '.main-nav a')).toEqual([
+      '/ru',
+      '/ru/par-mums',
+      '/ru/musu-pakalpojumi',
+      '/ru/musu-darbi',
+      '/ru/kontakti',
+    ]);
+    expect(root.querySelector('.main-nav a.active')?.getAttribute('href')).toBe('/ru/kontakti');
+    expect(hrefs(root)).toEqual(['/kontakti', '/ru/kontakti', '/en/kontakti']);
+  });
+
+  it('marks only the home link as active on the home page', async () => {
+    const root = (await appAt('/')).nativeElement as HTMLElement;
+
+    expect(hrefs(root, '.main-nav a.active')).toEqual(['/']);
+  });
+
+  it('shows the shop details', async () => {
+    const root = (await appAt('/kontakti')).nativeElement as HTMLElement;
+
+    expect(root.querySelector('main a[href="tel:+37128803119"]')).not.toBeNull();
+    expect(root.querySelector('main a[href="mailto:info@xenonfix.lv"]')).not.toBeNull();
+    expect(root.querySelector('footer')?.textContent).toContain('40203498222');
   });
 
   it('switches language through the switcher link', async () => {
@@ -44,7 +87,7 @@ describe('App', () => {
     await fixture.whenStable();
 
     expect(TestBed.inject(Router).url).toBe('/en');
-    expect(root.querySelector('h1')?.textContent).toBe('Headlight repair and sales');
+    expect(root.querySelector('h1')?.textContent).toBe('Car headlight repair');
     expect(hrefs(root)).toEqual(['/', '/ru', '/en']);
   });
 
@@ -57,15 +100,15 @@ describe('App', () => {
 
   it('writes canonical and language links without piling them up', async () => {
     await appAt('/');
-    await TestBed.inject(Router).navigateByUrl('/ru');
+    await TestBed.inject(Router).navigateByUrl('/ru/par-mums');
 
     const link = (selector: string) =>
       [...document.head.querySelectorAll(selector)].map((l) => l.getAttribute('href'));
-    expect(link('link[rel="canonical"]')).toEqual(['https://xenonfix.lv/ru']);
-    expect(link('link[hreflang="lv"]')).toEqual(['https://xenonfix.lv/']);
-    expect(link('link[hreflang="ru"]')).toEqual(['https://xenonfix.lv/ru']);
-    expect(link('link[hreflang="en"]')).toEqual(['https://xenonfix.lv/en']);
-    expect(link('link[hreflang="x-default"]')).toEqual(['https://xenonfix.lv/']);
-    expect(document.title).toBe('XenonFix — ремонт и продажа фар');
+    expect(link('link[rel="canonical"]')).toEqual(['https://xenonfix.lv/ru/par-mums']);
+    expect(link('link[hreflang="lv"]')).toEqual(['https://xenonfix.lv/par-mums']);
+    expect(link('link[hreflang="ru"]')).toEqual(['https://xenonfix.lv/ru/par-mums']);
+    expect(link('link[hreflang="en"]')).toEqual(['https://xenonfix.lv/en/par-mums']);
+    expect(link('link[hreflang="x-default"]')).toEqual(['https://xenonfix.lv/par-mums']);
+    expect(document.title).toBe('О нас — XenonFix');
   });
 });

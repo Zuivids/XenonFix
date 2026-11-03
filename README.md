@@ -73,13 +73,15 @@ MFA is left out for now. To add it: create a table for the admins' secrets, make
 admin authority only after the second step (`Authorities`).
 ## Languages
 
-Latvian is at the site root, as on the old site (`/`, later `/par-mums`). Russian and English
-are under a prefix (`/ru`, `/en/...`). The server renders every version in full, with
-`lang`, canonical and `hreflang` set, so Google can index each one.
+Latvian is at the site root, as on the old site (`/`, `/par-mums`). Russian and English are under
+a prefix with the same page names (`/ru`, `/en/par-mums`). The server renders every version in
+full, with `lang`, canonical and `hreflang` set, so Google can index each one.
 
-Texts are in `frontend/src/app/i18n/messages.*.ts`. A text missing from a language fails the
-build. New pages are added in `languageRoutes` in `app.routes.ts`, and `app.routes.server.ts`
-needs an entry for each language.
+Short texts are in `frontend/src/app/i18n/messages.*.ts`, and long ones in `content.*.ts`. A text
+missing from a language fails the build or a test. New pages are added to `PAGES` in
+`app.routes.ts`, which also covers all languages on the server.
+
+New files in `frontend/public` appear only after restarting the dev server.
 
 For production, list the site's host names under `allowedHosts` in `frontend/angular.json`,
 or Angular refuses to render the request.

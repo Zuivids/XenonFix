@@ -1,0 +1,92 @@
+<header class="site-header">
+  <div class="container header-row">
+    <a class="brand" [routerLink]="'/' | localized">
+      <img src="logo.png" [alt]="t('site.logoAlt')" width="644" height="192" />
+    </a>
+    <nav
+      id="main-nav"
+      class="main-nav"
+      [class.open]="menuOpen()"
+      [attr.aria-label]="t('site.mainNav')"
+      (click)="menuOpen.set(false)"
+    >
+      @for (link of navLinks; track link.path) {
+        <a
+          [routerLink]="link.path | localized"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: link.exact }"
+        >{{ t(link.label) }}</a>
+      }
+    </nav>
+    <div class="header-end">
+      <a class="header-phone" [href]="info.phoneHref">{{ info.phone }}</a>
+      <app-language-switcher />
+      <button
+        type="button"
+        class="menu-toggle"
+        [class.open]="menuOpen()"
+        [attr.aria-label]="t('site.menu')"
+        [attr.aria-expanded]="menuOpen()"
+        aria-controls="main-nav"
+        (click)="menuOpen.set(!menuOpen())"
+      >
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <router-outlet />
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-top">
+    <img src="logo.png" alt="XenonFix" width="644" height="192" loading="lazy" />
+    <div class="button-row">
+      <a class="button" [href]="info.phoneHref">{{ t('cta.call') }} {{ info.phone }}</a>
+      <a class="button secondary" [href]="info.whatsappHref" rel="noopener">{{ t('cta.whatsapp') }}</a>
+    </div>
+  </div>
+  <div class="container footer-columns">
+    <div>
+      <h2>{{ t('footer.menu') }}</h2>
+      <ul>
+        @for (link of navLinks; track link.path) {
+          <li><a [routerLink]="link.path | localized">{{ t(link.label) }}</a></li>
+        }
+      </ul>
+    </div>
+    <div>
+      <h2>{{ t('footer.terms') }}</h2>
+      <ul>
+        @for (link of termsLinks; track link.path) {
+          <li><a [routerLink]="link.path | localized">{{ t(link.label) }}</a></li>
+        }
+      </ul>
+    </div>
+    <div>
+      <h2>{{ t('nav.contact') }}</h2>
+      <ul>
+        <li>{{ info.street }}, {{ info.city }}</li>
+        <li><a [href]="info.phoneHref">{{ info.phone }}</a></li>
+        <li><a [href]="'mailto:' + info.email">{{ info.email }}</a></li>
+        <li>
+          <a [href]="info.instagramHref" rel="noopener">Instagram</a> ·
+          <a [href]="info.facebookHref" rel="noopener">Facebook</a>
+        </li>
+      </ul>
+    </div>
+    <div>
+      <h2>{{ t('footer.details') }}</h2>
+      <ul>
+        <li>{{ info.companyName }}</li>
+        <li>{{ t('footer.registration') }} {{ info.registrationNumber }}</li>
+        <li>{{ t('footer.vat') }} {{ info.vatNumber }}</li>
+        <li>{{ t('footer.account') }}: {{ info.bankAccount }}</li>
+      </ul>
+    </div>
+  </div>
+  <p class="container copyright">© {{ year }} {{ info.companyName }}</p>
+</footer>

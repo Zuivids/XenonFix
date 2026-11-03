@@ -1,3 +1,11 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #fff;
+  color: #1a1a1a;
+  color-scheme: light;
+}
+
 header {
   display: flex;
   flex-wrap: wrap;
