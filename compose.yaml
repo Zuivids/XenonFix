@@ -1,0 +1,30 @@
+# Local development database. Started by dev-start.bat / dev-start.sh, which also create .env.
+name: xenonfix
+
+services:
+  mariadb:
+    image: mariadb:11.4
+    container_name: xenonfix-mariadb
+    environment:
+      MARIADB_DATABASE: xenonfix
+      MARIADB_USER: ${DB_USERNAME:?set DB_USERNAME in .env}
+      MARIADB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?set DB_ROOT_PASSWORD in .env}
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    ports:
+      # Only reachable from this computer. Not 3306, so it can run next to other projects.
+      - "127.0.0.1:${DB_PORT:-3308}:3306"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+      # Recovery after an unclean shutdown (PC or Docker turned off) may take longer
+      start_period: 60s
+    restart: unless-stopped
+
+volumes:
+  # Data survives restarts; dev-reset-db removes it
+  mariadb-data:

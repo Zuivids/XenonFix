@@ -1,0 +1,6 @@
+# Local development only. dev-start.bat / dev-start.sh activate it; never use it in staging or production.
+
+spring:
+  config:
+    # Database settings from the .env in the repository root. Backend runs from backend/.
+    import: optional:file:../.env[.properties]

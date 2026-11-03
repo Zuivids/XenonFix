@@ -1,0 +1,19 @@
+### Secrets and local environment ###
+.env
+*.env.local
+
+### Local run output and uploaded files ###
+logs/
+uploads/
+
+### Build output (frontend has its own .gitignore) ###
+backend/target/
+
+### IDEs ###
+.idea/
+*.iml
+.vscode/
+
+### Claude: only the dev server list is shared ###
+.claude/*
+!.claude/launch.json

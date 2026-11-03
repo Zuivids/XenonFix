@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    # The Testcontainers database replaces these connection settings
+    password: unused
+
+app:
+  uploads-path: ${java.io.tmpdir}/xenonfix-test-uploads
