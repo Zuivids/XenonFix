@@ -1,0 +1,160 @@
+.back {
+  margin-top: 0;
+}
+
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.heading h1 {
+  margin: 0;
+}
+
+.status {
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+  background: #eee;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.status-PUBLISHED {
+  background: #d9f2e0;
+  color: #0f5c28;
+}
+
+.panel {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.panel h2 {
+  margin: 0 0 0.75rem;
+}
+
+.panel > .hint {
+  margin-bottom: 1rem;
+}
+
+form.wide {
+  display: block;
+  max-width: none;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 1rem;
+}
+
+.languages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: 1rem;
+}
+
+fieldset {
+  display: grid;
+  gap: 0.75rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0.875rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+legend {
+  padding-inline: 0.375rem;
+  font-weight: 700;
+}
+
+textarea {
+  padding: 0.5rem 0.625rem;
+  border: 1px solid #888;
+  border-radius: 4px;
+  font: inherit;
+  resize: vertical;
+}
+
+input.ng-invalid.ng-touched {
+  border-color: #b00020;
+}
+
+.images {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.875rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.images li:first-child img {
+  outline: 3px solid #1e42eb;
+}
+
+.images img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.image-actions {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.image-actions button {
+  padding: 0.25rem 0.5rem;
+}
+
+button.danger {
+  margin-left: auto;
+  border-color: #b00020;
+  color: #b00020;
+}
+
+.upload {
+  display: inline-block;
+}
+
+.upload input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.upload-button {
+  display: inline-block;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid #1a1a1a;
+  border-radius: 4px;
+  background: #1a1a1a;
+  color: #fff;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.upload-button.disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.upload input:focus-visible + .upload-button,
+.upload:focus-within .upload-button {
+  outline: 2px solid #1e42eb;
+  outline-offset: 2px;
+}

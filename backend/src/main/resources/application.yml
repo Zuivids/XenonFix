@@ -14,6 +14,7 @@ spring:
       ddl-auto: validate
     properties:
       hibernate:
+        default_batch_fetch_size: 50
         jdbc:
           time_zone: UTC
   flyway:
@@ -22,6 +23,11 @@ spring:
   mvc:
     problemdetails:
       enabled: true
+  servlet:
+    multipart:
+      # Phone photos, which are reduced after upload
+      max-file-size: 20MB
+      max-request-size: 21MB
 
 app:
   # Uploaded files stay on disk and the database holds their paths. Served at /uploads/**.
@@ -48,6 +54,9 @@ app:
 
 server:
   port: ${SERVER_PORT:8090}
+  tomcat:
+    # Reads an oversized upload to the end, so the browser gets the error instead of a dropped connection
+    max-swallow-size: 40MB
   error:
     include-stacktrace: never
     include-message: never

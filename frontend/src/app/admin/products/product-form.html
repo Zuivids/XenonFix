@@ -1,0 +1,134 @@
+<p class="back"><a routerLink="/admin/products">← Visi produkti</a></p>
+
+@if (loading()) {
+  <p>Ielādē…</p>
+} @else {
+  <div class="heading">
+    <h1>{{ product() ? form.controls.translations.controls.lv.controls.name.value : 'Jauns produkts' }}</h1>
+    @if (product(); as product) {
+      <span class="status" [class]="'status status-' + product.status">{{ statusNames[product.status] }}</span>
+    }
+  </div>
+
+  @if (error(); as message) {
+    <p class="error" role="alert">{{ message }}</p>
+  }
+
+  @if (product(); as product) {
+    <section class="panel">
+      <h2>Foto</h2>
+      <p class="hint">Pirmais foto ir galvenais. JPEG vai PNG, līdz 20 MB. Atrašanās vietas dati no failiem tiek noņemti.</p>
+      @if (product.images.length) {
+        <ul class="images">
+          @for (image of product.images; track image.id) {
+            <li>
+              <img [src]="image.thumbnailUrl" [alt]="'Foto ' + ($index + 1)" width="600" height="450" loading="lazy" />
+              <div class="image-actions">
+                <button type="button" class="secondary" [disabled]="$first" (click)="moveImage($index, -1)" aria-label="Pārvietot uz priekšu">←</button>
+                <button type="button" class="secondary" [disabled]="$last" (click)="moveImage($index, 1)" aria-label="Pārvietot uz aizmuguri">→</button>
+                <button type="button" class="secondary danger" (click)="removeImage(image)">Dzēst</button>
+              </div>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p>Vēl nav neviena foto. Publicēt var tikai produktu ar foto.</p>
+      }
+      <label class="upload">
+        <span class="upload-button" [class.disabled]="uploading()">{{ uploading() ? 'Augšupielādē…' : 'Pievienot foto' }}</span>
+        <input type="file" accept="image/jpeg,image/png" multiple [disabled]="uploading()" (change)="upload($event)" />
+      </label>
+      @for (message of imageErrors(); track $index) {
+        <p class="error" role="alert">{{ message }}</p>
+      }
+    </section>
+
+    <section class="panel">
+      <h2>Publicēšana</h2>
+      <p class="hint">
+        @switch (product.status) {
+          @case ('DRAFT') { Klienti šo produktu neredz. }
+          @case ('PUBLISHED') { Klienti šo produktu redzēs veikalā. }
+          @case ('ARCHIVED') { Produkts vairs netiek pārdots, un klienti to neredz. }
+        }
+      </p>
+      <div class="actions">
+        @if (product.status !== 'PUBLISHED') {
+          <button type="button" (click)="changeStatus('PUBLISHED')">Publicēt</button>
+        }
+        @if (product.status !== 'DRAFT') {
+          <button type="button" class="secondary" (click)="changeStatus('DRAFT')">Pārvērst par melnrakstu</button>
+        }
+        @if (product.status !== 'ARCHIVED') {
+          <button type="button" class="secondary" (click)="changeStatus('ARCHIVED')">Arhivēt</button>
+        }
+      </div>
+    </section>
+  } @else {
+    <p class="hint">Foto varēs pievienot pēc produkta saglabāšanas.</p>
+  }
+
+  <form class="wide" [formGroup]="form" (ngSubmit)="save()">
+    <section class="panel">
+      <h2>Cena un atlikums</h2>
+      <div class="fields">
+        <label>
+          Cena, €
+          <input type="number" formControlName="price" min="0.01" step="0.01" inputmode="decimal" />
+        </label>
+        <label>
+          Akcijas cena, €
+          <input type="number" formControlName="salePrice" min="0.01" step="0.01" inputmode="decimal" />
+          <span class="hint">Nav obligāta. Jābūt zemākai par cenu.</span>
+        </label>
+        <label>
+          Atlikums, gab.
+          <input type="number" formControlName="stockQuantity" min="0" step="1" inputmode="numeric" />
+        </label>
+        <label>
+          Detaļas numurs
+          <input type="text" formControlName="partNumber" autocomplete="off" />
+          <span class="hint">Piemēram, 8T0.941.032C</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="panel" formGroupName="translations">
+      <h2>Nosaukums un apraksts</h2>
+      <p class="hint">Latviešu valoda ir obligāta. Ja citas valodas nav aizpildītas, klients redzēs latvisko tekstu.</p>
+      <div class="languages">
+        @for (language of languages; track language.code) {
+          <fieldset [formGroupName]="language.code">
+            <legend>{{ language.name }}</legend>
+            <label>
+              Nosaukums
+              <input type="text" formControlName="name" autocomplete="off" />
+            </label>
+            <label>
+              Apraksts
+              <textarea formControlName="description" rows="6"></textarea>
+            </label>
+          </fieldset>
+        }
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Adrese</h2>
+      <label>
+        Lapas adrese
+        <input type="text" formControlName="slug" autocomplete="off" />
+        <span class="hint">
+          Tikai mazie burti, cipari un domuzīmes. Ja atstāsiet tukšu, to izveidos no latviskā nosaukuma.
+        </span>
+      </label>
+    </section>
+
+    @if (saved(); as message) {
+      <p role="status">{{ message }}</p>
+    }
+    <div class="actions">
+      <button type="submit" [disabled]="busy()">{{ product() ? 'Saglabāt' : 'Izveidot produktu' }}</button>
+    </div>
+  </form>
+}

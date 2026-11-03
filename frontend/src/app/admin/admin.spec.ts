@@ -100,11 +100,11 @@ describe('Admin panel', () => {
     expect(login.request.body).toEqual({ email: ME.email, password: 'correct horse battery' });
     login.flush({ status: 'AUTHENTICATED', admin: ME });
     (await request('/api/admin/me')).flush(ME);
-    (await request('/api/admin/admins')).flush([]);
+    (await request('/api/admin/products')).flush({ items: [], page: 0, totalPages: 0 });
     await settled(fixture);
 
-    expect(router.url).toBe('/admin/admins');
-    expect(root.querySelector('h1')?.textContent).toBe('Administratori');
+    expect(router.url).toBe('/admin/products');
+    expect(root.querySelector('h1')?.textContent).toBe('Produkti');
   });
 
   it('shows a clear message when the login fails, and clears the password', async () => {

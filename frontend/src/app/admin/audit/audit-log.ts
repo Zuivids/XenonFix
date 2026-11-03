@@ -17,6 +17,12 @@ const EVENT_NAMES: Record<string, string> = {
   ADMIN_DISABLED: 'Atslēgts administrators',
   ADMIN_ENABLED: 'Ieslēgts administrators',
   ADMIN_PASSWORD_RESET: 'Administratoram iestatīta jauna parole',
+  PRODUCT_CREATED: 'Pievienots produkts',
+  PRODUCT_UPDATED: 'Mainīts produkts',
+  PRODUCT_STOCK_CHANGED: 'Mainīts atlikums',
+  PRODUCT_STATUS_CHANGED: 'Mainīts produkta statuss',
+  PRODUCT_IMAGE_ADDED: 'Pievienots produkta foto',
+  PRODUCT_IMAGE_REMOVED: 'Dzēsts produkta foto',
 };
 
 @Component({

@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -27,7 +29,10 @@ public class WebConfig implements WebMvcConfigurer {
 			throw new UncheckedIOException("Cannot create uploads directory " + this.uploadsPath, ex);
 		}
 		// Path.toUri() ends with "/" for an existing directory, as resource locations require
-		registry.addResourceHandler("/uploads/**").addResourceLocations(this.uploadsPath.toUri().toString());
+		registry.addResourceHandler("/uploads/**")
+			.addResourceLocations(this.uploadsPath.toUri().toString())
+			// Uploaded files get a new random name instead of changing, so they can be cached for long
+			.setCacheControl(CacheControl.maxAge(Duration.ofDays(365)).cachePublic());
 	}
 
 }

@@ -65,12 +65,19 @@ The panel is at `/admin`, in Latvian only, and is not indexed by search engines.
   their own account, so one active admin always remains.
 - **Protection:** Argon2id password hashes, session cookie with CSRF protection, 30 minutes idle
   and 8 hours absolute session time, blocks after repeated failures, and a request limit per IP.
-- **Audit log:** logins, password changes and changes to admins, in `audit_log`. Never write
-  passwords to it. Later features add their own event types.
+- **Products:** name and description per language (only Latvian is required), part number, price,
+  sale price, stock and photos. A product starts as a draft and needs a photo to be published.
+  Products are archived rather than deleted, because reservations will refer to them.
+- **Photos:** JPEG or PNG up to 20 MB, judged by content. Each is turned upright and re-encoded as
+  a JPEG of at most 1600 px plus a 600 px thumbnail, which also drops metadata such as GPS. Files
+  are in `products/<id>/` under the uploads folder, so back that folder up with the database.
+- **Audit log:** logins, password changes, and changes to admins and products, in `audit_log`.
+  Never write passwords to it. Later features add their own event types.
 
 MFA is left out for now. To add it: create a table for the admins' secrets, make the login answer
 `MFA_REQUIRED` from `AuthService.login` (`LoginResponse.Status` is ready for it), and grant the
 admin authority only after the second step (`Authorities`).
+
 ## Languages
 
 Latvian is at the site root, as on the old site (`/`, `/par-mums`). Russian and English are under

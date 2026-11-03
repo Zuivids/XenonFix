@@ -12,7 +12,22 @@ export const adminRoutes: Routes = [
     component: AdminLayout,
     canActivate: [adminGuard],
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'admins' },
+      { path: '', pathMatch: 'full', redirectTo: 'products' },
+      {
+        path: 'products',
+        title: 'Produkti — XenonFix',
+        loadComponent: () => import('./products/product-list').then((m) => m.ProductList),
+      },
+      {
+        path: 'products/new',
+        title: 'Jauns produkts — XenonFix',
+        loadComponent: () => import('./products/product-form').then((m) => m.ProductForm),
+      },
+      {
+        path: 'products/:id',
+        title: 'Produkts — XenonFix',
+        loadComponent: () => import('./products/product-form').then((m) => m.ProductForm),
+      },
       {
         path: 'admins',
         title: 'Administratori — XenonFix',
@@ -28,7 +43,7 @@ export const adminRoutes: Routes = [
         title: 'Mainīt paroli — XenonFix',
         loadComponent: () => import('./password/change-password').then((m) => m.ChangePassword),
       },
-      { path: '**', redirectTo: 'admins' },
+      { path: '**', redirectTo: 'products' },
     ],
   },
 ];

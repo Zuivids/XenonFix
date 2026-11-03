@@ -16,6 +16,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<bouncycastle.version>1.86</bouncycastle.version>
+		<metadata-extractor.version>2.19.0</metadata-extractor.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -46,6 +47,12 @@
 		<dependency>
 			<groupId>com.github.ben-manes.caffeine</groupId>
 			<artifactId>caffeine</artifactId>
+		</dependency>
+		<!-- Reads the rotation that phones store in photos, so uploads are not sideways -->
+		<dependency>
+			<groupId>com.drewnoakes</groupId>
+			<artifactId>metadata-extractor</artifactId>
+			<version>${metadata-extractor.version}</version>
 		</dependency>
 		<!-- Required by Spring Security's Argon2PasswordEncoder -->
 		<dependency>
