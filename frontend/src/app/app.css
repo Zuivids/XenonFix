@@ -8,11 +8,10 @@ header {
   border-bottom: 1px solid #ddd;
 }
 
-.brand {
-  color: inherit;
-  font-weight: 700;
-  font-size: 1.25rem;
-  text-decoration: none;
+.brand img {
+  display: block;
+  width: auto;
+  height: 3rem;
 }
 
 main {
