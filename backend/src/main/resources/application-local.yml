@@ -4,6 +4,16 @@ spring:
   config:
     # Database and admin settings from the .env in the repository root. Backend runs from backend/.
     import: optional:file:../.env[.properties]
+  mail:
+    # Mailpit from compose.yaml catches all email and nothing leaves this computer, unless .env
+    # names a real mail server. See .env.example.
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:${MAILPIT_SMTP_PORT:1026}}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: ${MAIL_AUTH:false}
+      mail.smtp.starttls.enable: ${MAIL_STARTTLS:false}
 
 app:
   bootstrap-admin:

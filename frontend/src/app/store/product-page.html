@@ -1,0 +1,66 @@
+@if (product(); as item) {
+  <div class="container product">
+    <div class="gallery">
+      @if (image(); as photo) {
+        <div class="main-photo zoom">
+          <img [src]="photo.url" [alt]="item.name" [width]="photo.width" [height]="photo.height" fetchpriority="high" />
+        </div>
+      }
+      @if (item.images.length > 1) {
+        <div class="thumbnails">
+          @for (photo of item.images; track photo.url) {
+            <button
+              type="button"
+              class="thumbnail zoom"
+              [class.active]="photo === image()"
+              [attr.aria-label]="t('store.showPhoto') + ' ' + ($index + 1)"
+              [attr.aria-current]="photo === image() ? 'true' : null"
+              (click)="selected.set($index)"
+            >
+              <img [src]="photo.thumbnailUrl" alt="" width="120" height="90" loading="lazy" />
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="details">
+      <a class="back" [routerLink]="'/store' | localized">← {{ t('store.back') }}</a>
+      <h1>{{ item.name }}</h1>
+      <app-price class="price" [price]="item.price" [salePrice]="item.salePrice" />
+      <p class="availability" [class.out]="!item.available">
+        {{ t(item.available ? 'store.inStock' : 'store.outOfStock') }}
+      </p>
+      @if (item.partNumber) {
+        <p class="part">{{ t('store.partNumber') }}: {{ item.partNumber }}</p>
+      }
+      @if (item.description) {
+        <p class="description">{{ item.description }}</p>
+      }
+
+      @if (item.available) {
+        <app-reservation-form [slug]="item.slug" (outOfStock)="refresh()" />
+      } @else {
+        <div class="sold-out">
+          @if (lostLastOne()) {
+            <p role="alert">{{ t('reservation.errorOutOfStock') }}</p>
+          }
+          <p>{{ t('store.outOfStockHelp') }}</p>
+          <div class="button-row">
+            <a class="button" [href]="info.phoneHref">{{ t('cta.call') }} {{ info.phone }}</a>
+            <a class="button secondary" [href]="info.whatsappHref" rel="noopener">{{ t('cta.whatsapp') }}</a>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+} @else if (lookup()?.state === 'unavailable') {
+  <header class="page-head">
+    <div class="container">
+      <h1>{{ t('store.heading') }}</h1>
+      <p class="lead" role="alert">{{ t('store.unavailable') }}</p>
+    </div>
+  </header>
+} @else {
+  <app-not-found />
+}

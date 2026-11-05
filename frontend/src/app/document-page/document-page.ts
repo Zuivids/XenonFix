@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { I18n } from '../i18n/i18n';
 import { MessageKey } from '../i18n/messages.lv';
 
-type DocumentName = 'payment' | 'delivery' | 'warranty';
+type DocumentName = 'payment' | 'delivery' | 'warranty' | 'privacy';
 
 /** A longer text page. The route data says which text and heading. */
 @Component({
@@ -11,7 +11,7 @@ type DocumentName = 'payment' | 'delivery' | 'warranty';
   template: `
     <header class="page-head">
       <div class="container">
-        <p class="eyebrow">{{ i18n.t('footer.terms') }}</p>
+        <p class="eyebrow">{{ i18n.t(eyebrow) }}</p>
         <h1>{{ i18n.t(heading) }}</h1>
       </div>
     </header>
@@ -104,6 +104,7 @@ export class DocumentPage {
   protected readonly i18n = inject(I18n);
   private readonly data = inject(ActivatedRoute).snapshot.data;
 
+  protected readonly eyebrow = (this.data['eyebrow'] ?? 'footer.terms') as MessageKey;
   protected readonly heading = this.data['heading'] as MessageKey;
   private readonly documentName = this.data['document'] as DocumentName;
   protected readonly sections = computed(() => this.i18n.content()[this.documentName]);

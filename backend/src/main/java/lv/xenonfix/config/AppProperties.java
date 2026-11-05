@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties("app")
 public record AppProperties(Path uploadsPath, BootstrapAdmin bootstrapAdmin, Lockout lockout, RateLimit rateLimit,
-		Session session) {
+		Session session, Reservation reservation, Mail mail) {
 
 	/**
 	 * @param email email of the first admin; empty means no admin is created
@@ -24,6 +24,16 @@ public record AppProperties(Path uploadsPath, BootstrapAdmin bootstrapAdmin, Loc
 	}
 
 	public record Session(Duration idle, Duration absolute) {
+	}
+
+	public record Reservation(RateLimit rateLimit) {
+	}
+
+	/**
+	 * @param from the address emails are sent from
+	 * @param shop where the shop's copies go
+	 */
+	public record Mail(String from, String shop) {
 	}
 
 }

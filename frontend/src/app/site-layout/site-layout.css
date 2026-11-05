@@ -25,6 +25,7 @@ main {
 }
 
 .brand {
+  flex: none;
   transition: opacity 0.3s var(--ease);
 }
 
@@ -62,6 +63,7 @@ main {
   font-size: 1.0625rem;
   font-weight: 600;
   text-decoration: none;
+  white-space: nowrap;
   transition: color 0.3s var(--ease);
 }
 
@@ -211,13 +213,18 @@ main {
   font-size: 0.875rem;
 }
 
+.copyright a {
+  color: inherit;
+}
+
 @media (min-width: 40rem) {
   .header-phone {
     display: inline;
   }
 }
 
-@media (min-width: 62rem) {
+/* The width where the logo, all the links and the phone number fit on one line in every language */
+@media (min-width: 72rem) {
   .main-nav {
     display: flex;
     position: static;

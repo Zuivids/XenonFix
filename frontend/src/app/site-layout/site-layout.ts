@@ -10,6 +10,7 @@ const NAV_LINKS: { path: string; label: MessageKey; exact: boolean }[] = [
   { path: '/', label: 'nav.home', exact: true },
   { path: '/par-mums', label: 'nav.about', exact: false },
   { path: '/musu-pakalpojumi', label: 'nav.services', exact: false },
+  { path: '/store', label: 'nav.store', exact: false },
   { path: '/musu-darbi', label: 'nav.works', exact: false },
   { path: '/kontakti', label: 'nav.contact', exact: false },
 ];

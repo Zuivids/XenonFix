@@ -25,6 +25,16 @@ services:
       start_period: 60s
     restart: unless-stopped
 
+  # Catches the emails the backend sends, so nothing reaches real people during development.
+  # Read them at http://localhost:8026
+  mailpit:
+    image: axllent/mailpit:v1.27
+    container_name: xenonfix-mailpit
+    ports:
+      - "127.0.0.1:${MAILPIT_SMTP_PORT:-1026}:1025"
+      - "127.0.0.1:${MAILPIT_WEB_PORT:-8026}:8025"
+    restart: unless-stopped
+
 volumes:
   # Data survives restarts; dev-reset-db removes it
   mariadb-data:

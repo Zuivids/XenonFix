@@ -1,0 +1,99 @@
+.product {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  padding-block: clamp(1.5rem, 4vw, 3.5rem) 0;
+}
+
+.main-photo {
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: var(--surface);
+}
+
+.thumbnails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  margin-top: 0.75rem;
+}
+
+.thumbnail {
+  width: 5rem;
+  height: 3.75rem;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 0.625rem;
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color 0.25s var(--ease);
+}
+
+.thumbnail:hover,
+.thumbnail.active {
+  border-color: var(--accent);
+}
+
+.back {
+  color: var(--muted);
+  font-size: 0.9375rem;
+  text-decoration: none;
+  transition: color 0.25s var(--ease);
+}
+
+.back:hover {
+  color: var(--accent);
+}
+
+h1 {
+  margin: 0.75rem 0 1rem;
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+.price {
+  font-size: 1.5rem;
+}
+
+.availability {
+  margin: 0.5rem 0 0;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.availability.out {
+  color: var(--muted);
+}
+
+.part {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+.description {
+  margin: 1.25rem 0 0;
+  color: #3a4252;
+  white-space: pre-line;
+}
+
+app-reservation-form,
+.sold-out {
+  display: block;
+  margin-top: 1.75rem;
+}
+
+.sold-out p {
+  margin: 0 0 1rem;
+}
+
+@media (min-width: 56rem) {
+  .product {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .gallery {
+    position: sticky;
+    top: 6rem;
+  }
+}

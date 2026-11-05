@@ -19,18 +19,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.UrlPathHelper;
 
 /**
- * Limits requests that check a password, per client IP.
+ * Limits POST requests to the given paths, per client IP.
  *
  * <p>
  * Uses the connection's remote address. Behind a reverse proxy this is the proxy's
  * address until forwarded headers are configured; until then every client would share one
  * limit.
  */
-public class AuthRateLimitFilter extends OncePerRequestFilter {
+public class RateLimitFilter extends OncePerRequestFilter {
 
-	private static final Logger logger = LoggerFactory.getLogger(AuthRateLimitFilter.class);
-
-	private static final Set<String> LIMITED_PATHS = Set.of("/api/admin/auth/login", "/api/admin/me/password");
+	private static final Logger logger = LoggerFactory.getLogger(RateLimitFilter.class);
 
 	private static final String PROBLEM_BODY = """
 			{"type":"about:blank","title":"Too Many Requests","status":429,"code":"TOO_MANY_REQUESTS"}""";
@@ -39,21 +37,30 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
 
 	private final AppProperties.RateLimit rule;
 
-	public AuthRateLimitFilter(RateLimiter rateLimiter, AppProperties properties) {
+	private final Set<String> paths;
+
+	private final String keyPrefix;
+
+	/**
+	 * @param keyPrefix keeps this filter's counts apart from other filters' for the same IP
+	 */
+	public RateLimitFilter(RateLimiter rateLimiter, AppProperties.RateLimit rule, Set<String> paths, String keyPrefix) {
 		this.rateLimiter = rateLimiter;
-		this.rule = properties.rateLimit();
+		this.rule = rule;
+		this.paths = paths;
+		this.keyPrefix = keyPrefix;
 	}
 
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) {
-		return !"POST".equals(request.getMethod()) || !LIMITED_PATHS.contains(path(request));
+		return !"POST".equals(request.getMethod()) || !this.paths.contains(path(request));
 	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
 		String ip = request.getRemoteAddr();
-		RateLimiter.Decision decision = this.rateLimiter.tryAcquire(ip, this.rule);
+		RateLimiter.Decision decision = this.rateLimiter.tryAcquire(this.keyPrefix + ip, this.rule);
 		if (decision.allowed()) {
 			chain.doFilter(request, response);
 			return;

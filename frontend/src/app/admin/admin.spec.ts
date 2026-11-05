@@ -4,7 +4,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router, TitleStrategy } from '@angular/router';
 import { App } from '../app';
 import { routes } from '../app.routes';
+import { of } from 'rxjs';
 import { SeoTitleStrategy } from '../seo/seo-title-strategy';
+import { StoreApi } from '../store/store-api';
 import { Me } from './admin-api';
 import { sessionExpiredInterceptor } from './session-expired.interceptor';
 
@@ -22,6 +24,8 @@ describe('Admin panel', () => {
         provideHttpClient(withInterceptors([sessionExpiredInterceptor])),
         provideHttpClientTesting(),
         { provide: TitleStrategy, useClass: SeoTitleStrategy },
+        // For the public pages some of these tests pass through
+        { provide: StoreApi, useValue: { list: () => of({ items: [], page: 0, totalPages: 0 }) } },
       ],
     });
     http = TestBed.inject(HttpTestingController);

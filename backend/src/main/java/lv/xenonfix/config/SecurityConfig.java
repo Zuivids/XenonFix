@@ -2,6 +2,7 @@ package lv.xenonfix.config;
 
 import java.time.Clock;
 import java.util.Map;
+import java.util.Set;
 
 import lv.xenonfix.admin.AdminUserRepository;
 import lv.xenonfix.audit.AuditEventType;
@@ -9,7 +10,7 @@ import lv.xenonfix.audit.AuditService;
 import lv.xenonfix.auth.AuthenticatedAdmin;
 import lv.xenonfix.auth.Authorities;
 import lv.xenonfix.auth.SessionPolicyFilter;
-import lv.xenonfix.ratelimit.AuthRateLimitFilter;
+import lv.xenonfix.ratelimit.RateLimitFilter;
 import lv.xenonfix.ratelimit.RateLimiter;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -35,6 +36,8 @@ import org.springframework.security.web.context.SecurityContextRepository;
 @EnableWebSecurity
 class SecurityConfig {
 
+	private static final String RESERVATIONS_PATH = "/api/store/reservations";
+
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http, SecurityContextRepository securityContextRepository,
 			AuditService audit, AdminUserRepository admins, AppProperties properties, Clock clock) throws Exception {
@@ -44,10 +47,14 @@ class SecurityConfig {
 			.addFilterAfter(new SessionPolicyFilter(admins, audit, properties, clock),
 					SecurityContextHolderFilter.class)
 			// Token in a readable XSRF-TOKEN cookie, which Angular sends back in X-XSRF-TOKEN
-			.csrf((csrf) -> csrf.spa())
+			// Reservations are anonymous and use no login or session, so a forged request gains
+			// nothing that anyone could not do by filling in the form
+			.csrf((csrf) -> csrf.spa().ignoringRequestMatchers(RESERVATIONS_PATH))
 			.authorizeHttpRequests((auth) -> auth
 				.requestMatchers("/error").permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/health", "/uploads/**").permitAll()
+				.requestMatchers(HttpMethod.GET, "/api/store/products", "/api/store/products/*").permitAll()
+				.requestMatchers(HttpMethod.POST, RESERVATIONS_PATH).permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/admin/auth/csrf").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/admin/auth/login").permitAll()
 				// Reachable before the password is changed; everything else needs the full role
@@ -90,8 +97,22 @@ class SecurityConfig {
 
 	/** Before Spring Security, so rejected requests cost almost nothing. */
 	@Bean
-	FilterRegistrationBean<AuthRateLimitFilter> authRateLimitFilter(RateLimiter rateLimiter, AppProperties properties) {
-		var registration = new FilterRegistrationBean<>(new AuthRateLimitFilter(rateLimiter, properties));
+	FilterRegistrationBean<RateLimitFilter> authRateLimitFilter(RateLimiter rateLimiter, AppProperties properties) {
+		return rateLimit("authRateLimitFilter", new RateLimitFilter(rateLimiter, properties.rateLimit(),
+				Set.of("/api/admin/auth/login", "/api/admin/me/password"), "auth:"));
+	}
+
+	@Bean
+	FilterRegistrationBean<RateLimitFilter> reservationRateLimitFilter(RateLimiter rateLimiter,
+			AppProperties properties) {
+		return rateLimit("reservationRateLimitFilter", new RateLimitFilter(rateLimiter,
+				properties.reservation().rateLimit(), Set.of(RESERVATIONS_PATH), "reservation:"));
+	}
+
+	/** Each needs its own name, or the server would only register the first of this class. */
+	private static FilterRegistrationBean<RateLimitFilter> rateLimit(String name, RateLimitFilter filter) {
+		var registration = new FilterRegistrationBean<>(filter);
+		registration.setName(name);
 		registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 10);
 		return registration;
 	}

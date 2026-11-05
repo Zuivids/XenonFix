@@ -88,5 +88,8 @@
       </ul>
     </div>
   </div>
-  <p class="container copyright">© {{ year }} {{ info.companyName }}</p>
+  <p class="container copyright">
+    © {{ year }} {{ info.companyName }} ·
+    <a [routerLink]="'/privatuma-politika' | localized">{{ t('privacy.heading') }}</a>
+  </p>
 </footer>

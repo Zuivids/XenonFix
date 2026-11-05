@@ -26,4 +26,5 @@ export interface Content {
   payment: DocumentSection[];
   delivery: DocumentSection[];
   warranty: DocumentSection[];
+  privacy: DocumentSection[];
 }

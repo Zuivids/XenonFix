@@ -9,6 +9,9 @@ import { Language, languagePrefix } from './i18n/languages';
 import { NotFound } from './not-found/not-found';
 import { Services } from './services/services';
 import { SiteLayout } from './site-layout/site-layout';
+import { ProductPage } from './store/product-page';
+import { StoreList } from './store/store-list';
+import { featuredProductsResolver, productResolver, storePageResolver } from './store/store.resolvers';
 import { Works } from './works/works';
 
 /**
@@ -25,6 +28,25 @@ const PAGES: Route[] = [
   },
   { path: 'musu-darbi', component: Works, title: 'works.title', data: { description: 'works.description' } },
   { path: 'kontakti', component: Contact, title: 'contact.title', data: { description: 'contact.description' } },
+  {
+    path: 'store',
+    component: StoreList,
+    title: 'store.title',
+    data: { description: 'store.description' },
+    resolve: { result: storePageResolver },
+    runGuardsAndResolvers: 'paramsOrQueryParamsChange',
+  },
+  {
+    path: 'privatuma-politika',
+    component: DocumentPage,
+    title: 'privacy.title',
+    data: {
+      description: 'privacy.description',
+      heading: 'privacy.heading',
+      eyebrow: 'privacy.eyebrow',
+      document: 'privacy',
+    },
+  },
   {
     path: 'apmaksas-nosacijumi',
     component: DocumentPage,
@@ -47,6 +69,20 @@ const PAGES: Route[] = [
 
 export const PAGE_PATHS = PAGES.map((page) => page.path!);
 
+/**
+ * Apart from PAGES, because the address has a parameter. The title and description are for a
+ * product that is not found; SeoTitleStrategy uses the product's own when there is one.
+ */
+export const PRODUCT_PATH = 'product/:slug';
+
+const PRODUCT_ROUTE: Route = {
+  path: PRODUCT_PATH,
+  component: ProductPage,
+  title: 'notFound.title',
+  data: { description: 'home.description' },
+  resolve: { lookup: productResolver },
+};
+
 function languageRoutes(language: Language): Route {
   return {
     path: languagePrefix(language),
@@ -59,8 +95,10 @@ function languageRoutes(language: Language): Route {
         component: Home,
         title: 'home.title',
         data: { description: 'home.description' },
+        resolve: { featured: featuredProductsResolver },
       },
       ...PAGES,
+      PRODUCT_ROUTE,
       {
         path: '**',
         component: NotFound,

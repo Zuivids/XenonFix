@@ -23,6 +23,7 @@ const EVENT_NAMES: Record<string, string> = {
   PRODUCT_STATUS_CHANGED: 'Mainīts produkta statuss',
   PRODUCT_IMAGE_ADDED: 'Pievienots produkta foto',
   PRODUCT_IMAGE_REMOVED: 'Dzēsts produkta foto',
+  RESERVATION_CREATED: 'Jauna rezervācija',
 };
 
 @Component({

@@ -1,5 +1,5 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
-import { PAGE_PATHS } from './app.routes';
+import { PAGE_PATHS, PRODUCT_PATH } from './app.routes';
 
 const LANGUAGE_PREFIXES = ['', 'ru/', 'en/'];
 
@@ -11,7 +11,7 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'ru', renderMode: RenderMode.Server },
   { path: 'en', renderMode: RenderMode.Server },
   ...LANGUAGE_PREFIXES.flatMap((prefix) =>
-    PAGE_PATHS.map((page) => ({ path: prefix + page, renderMode: RenderMode.Server as const })),
+    [...PAGE_PATHS, PRODUCT_PATH].map((page) => ({ path: prefix + page, renderMode: RenderMode.Server as const })),
   ),
   // Real 404 status for unknown pages, so search engines do not index them
   { path: 'ru/**', renderMode: RenderMode.Server, status: 404 },

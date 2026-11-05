@@ -312,4 +312,55 @@ export const enContent: Content = {
       closing: 'We provide high-quality, reliable repairs so that your car’s headlights serve you safely for a long time.',
     },
   ],
+  // Draft for review before launch. The texts in [square brackets] need the owner's decision.
+  privacy: [
+    {
+      heading: 'Who processes your data',
+      paragraphs: [
+        'The data controller is SIA Elekanga, registration number 40203498222, Bauskas iela 16c, Riga, LV-1004. For questions about your data, write to info@xenonfix.lv or call +371 288 03 119.',
+      ],
+    },
+    {
+      heading: 'What data we process',
+      items: [
+        'When you reserve a product: your name, phone number, email address, any comment you add, and the product and quantity reserved.',
+        'For security: the time of the reservation and the IP address in our event log, to detect and prevent misuse.',
+      ],
+    },
+    {
+      heading: 'Why we process it',
+      items: [
+        'To process your reservation, contact you and hand over the product. Legal basis: steps taken at your request before entering into a contract (GDPR Article 6(1)(b)).',
+        'To protect the website from misuse. Legal basis: our legitimate interests (GDPR Article 6(1)(f)).',
+      ],
+      closing: 'We do not use this data for advertising and do not sell it. We cannot process a reservation without it.',
+    },
+    {
+      heading: 'Who can access the data',
+      paragraphs: [
+        'Our staff who process reservations can access the data, as can the service providers that run the website and send email: [name the hosting and email providers and, if data leaves the EEA, on what basis].',
+      ],
+    },
+    {
+      heading: 'How long we keep the data',
+      paragraphs: [
+        'We keep reservation data for [state the period, for example how long after the reservation is completed], unless the law requires longer, such as for accounting documents. We keep event log entries for [state the period].',
+      ],
+    },
+    {
+      heading: 'Your rights',
+      items: [
+        'To get information about your data and a copy of it.',
+        'To correct inaccurate data.',
+        'To ask for your data to be deleted or its processing restricted.',
+        'To object to processing based on legitimate interests.',
+        'To receive your data in a portable format.',
+      ],
+      closing: 'To use these rights, write to info@xenonfix.lv. You also have the right to complain to the Data State Inspectorate of Latvia (www.dvi.gov.lv).',
+    },
+    {
+      heading: 'Cookies',
+      paragraphs: ['We do not use analytics or advertising cookies on the public part of the website.'],
+    },
+  ],
 };

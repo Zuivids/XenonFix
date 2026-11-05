@@ -1,0 +1,75 @@
+@if (reference(); as code) {
+  <div class="done" role="status">
+    <h2>{{ t('reservation.successHeading') }}</h2>
+    <p class="code">{{ t('reservation.successReference') }} <strong>{{ code }}</strong></p>
+    <p>{{ t('reservation.successText') }}</p>
+  </div>
+} @else {
+  <form class="panel" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <h2>{{ t('reservation.heading') }}</h2>
+    <p class="intro">{{ t('reservation.intro') }}</p>
+
+    <label class="field short">
+      <span>{{ t('reservation.quantity') }}</span>
+      <select formControlName="quantity">
+        @for (quantity of quantities; track quantity) {
+          <option [ngValue]="quantity">{{ quantity }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="field">
+      <span>{{ t('reservation.name') }}</span>
+      <input type="text" formControlName="name" autocomplete="name" maxlength="100" />
+      @if (shouldShowError('name')) {
+        <small class="problem">{{ t('reservation.required') }}</small>
+      }
+    </label>
+
+    <label class="field">
+      <span>{{ t('reservation.phone') }}</span>
+      <input type="tel" formControlName="phone" autocomplete="tel" maxlength="30" />
+      @if (shouldShowError('phone')) {
+        <small class="problem">{{ t('reservation.invalidPhone') }}</small>
+      }
+    </label>
+
+    <label class="field">
+      <span>{{ t('reservation.email') }}</span>
+      <input type="email" formControlName="email" autocomplete="email" maxlength="254" />
+      @if (shouldShowError('email')) {
+        <small class="problem">{{ t('reservation.invalidEmail') }}</small>
+      }
+    </label>
+
+    <label class="field">
+      <span>{{ t('reservation.comment') }}</span>
+      <textarea formControlName="comment" rows="3" maxlength="1000"></textarea>
+    </label>
+
+    <!-- People never see this field; bots fill it in, and the backend then refuses the request -->
+    <label class="trap" aria-hidden="true">
+      Website
+      <input type="text" formControlName="website" tabindex="-1" autocomplete="off" />
+    </label>
+
+    <label class="consent">
+      <input type="checkbox" formControlName="privacyAccepted" />
+      <span>
+        {{ t('reservation.privacyBefore') }}
+        <a [routerLink]="'/privatuma-politika' | localized" target="_blank">{{ t('reservation.privacyLink') }}</a>.
+      </span>
+    </label>
+    @if (shouldShowError('privacyAccepted')) {
+      <small class="problem">{{ t('reservation.privacyRequired') }}</small>
+    }
+
+    @if (error(); as message) {
+      <p class="failure" role="alert">{{ t(message) }}</p>
+    }
+
+    <button class="button" type="submit" [disabled]="busy()">
+      {{ t(busy() ? 'reservation.sending' : 'reservation.submit') }}
+    </button>
+  </form>
+}

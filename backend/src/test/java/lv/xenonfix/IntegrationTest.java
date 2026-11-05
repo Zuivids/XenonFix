@@ -36,6 +36,11 @@ public @interface IntegrationTest {
 			return new MutableClock(Instant.now().truncatedTo(ChronoUnit.SECONDS));
 		}
 
+		@Bean
+		RecordingMailSender testMailSender() {
+			return new RecordingMailSender();
+		}
+
 	}
 
 }

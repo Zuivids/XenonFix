@@ -26,6 +26,7 @@ If you delete `.env`, reset the database too, because it keeps the old password.
 | Admin panel | http://localhost:4300/admin, login in `.env` |
 | Backend health | http://localhost:8090/api/health |
 | Database | `localhost:3308`, database `xenonfix`, login in `.env` |
+| Emails sent locally | http://localhost:8026 (Mailpit; nothing reaches real addresses) |
 | Logs | `logs/backend.log`, `logs/frontend.log` |
 
 The ports differ from other local projects on purpose, so they can run side by side and
@@ -77,6 +78,29 @@ The panel is at `/admin`, in Latvian only, and is not indexed by search engines.
 MFA is left out for now. To add it: create a table for the admins' secrets, make the login answer
 `MFA_REQUIRED` from `AuthService.login` (`LoginResponse.Status` is ready for it), and grant the
 admin authority only after the second step (`Authorities`).
+
+## Store and reservations
+
+Customers have no accounts. The store is at `/store`, a product at `/product/<slug>`, with the
+usual language prefixes. Only published products are shown, without the stock number, and text
+that is not translated falls back to Latvian.
+
+- **Reserving:** one product per reservation, up to 10 pieces, without paying. The customer collects
+  it at the shop. `POST /api/store/reservations` is the only public endpoint that changes anything:
+  it is limited per IP and has a hidden field to catch bots. It needs no CSRF token, because it uses
+  no login or session.
+- **Stock** is taken when the reservation is made, in one conditional `UPDATE`, so two customers
+  cannot get the last piece. The same statement raises the product's version, so an admin's product
+  form opened earlier is refused rather than putting the old stock back. It stays taken until an
+  admin handles the reservation.
+- **Emails** go to the customer, in their language, and to the shop (`APP_MAIL_SHOP`), after the
+  reservation is saved and in the background. A mail problem never loses a reservation, but a failed
+  email is not sent again; the log has the reference only.
+- **Locally** emails stop at Mailpit, unless `.env` names a real mail server (see `.env.example`).
+  The automated tests never send real email.
+- **On a server** set `SPRING_MAIL_HOST` and the other `SPRING_MAIL_*` settings, or the backend does
+  not start. Set `BACKEND_URL` for the frontend server if the backend is not at
+  `http://localhost:8090`.
 
 ## Languages
 

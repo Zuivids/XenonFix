@@ -28,6 +28,13 @@ spring:
       # Phone photos, which are reduced after upload
       max-file-size: 20MB
       max-request-size: 21MB
+  # The server is set with SPRING_MAIL_HOST and the like. Without one the application does not
+  # start, so a server cannot go live while silently unable to send email.
+  mail:
+    properties:
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 10000
+      mail.smtp.writetimeout: 10000
 
 app:
   # Uploaded files stay on disk and the database holds their paths. Served at /uploads/**.
@@ -51,6 +58,14 @@ app:
   session:
     idle: 30m
     absolute: 8h
+  reservation:
+    # Reservations per client IP: enough for a customer, and limits a bot filling the form
+    rate-limit:
+      limit: 5
+      window: 10m
+  mail:
+    from: ${APP_MAIL_FROM:info@xenonfix.lv}
+    shop: ${APP_MAIL_SHOP:info@xenonfix.lv}
 
 server:
   port: ${SERVER_PORT:8090}

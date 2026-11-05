@@ -315,4 +315,55 @@ export const lvContent: Content = {
       closing: 'Nodrošinām kvalitatīvu un uzticamu remontu, lai Jūsu auto lukturi kalpotu ilgstoši un droši.',
     },
   ],
+  // Draft for review before launch. The texts in [square brackets] need the owner's decision.
+  privacy: [
+    {
+      heading: 'Kas apstrādā Jūsu datus',
+      paragraphs: [
+        'Datu pārzinis ir SIA Elekanga, reģistrācijas numurs 40203498222, Bauskas iela 16c, Rīga, LV-1004. Ar jautājumiem par datiem rakstiet uz info@xenonfix.lv vai zvaniet +371 288 03 119.',
+      ],
+    },
+    {
+      heading: 'Kādus datus mēs apstrādājam',
+      items: [
+        'Rezervējot produktu: vārdu un uzvārdu, tālruņa numuru, e-pasta adresi, komentāru, ja to norādāt, kā arī rezervēto produktu un daudzumu.',
+        'Drošībai: rezervācijas laiku un IP adresi notikumu žurnālā, lai varētu atklāt un novērst ļaunprātīgu izmantošanu.',
+      ],
+    },
+    {
+      heading: 'Kāpēc mēs tos apstrādājam',
+      items: [
+        'Lai apstrādātu rezervāciju, sazinātos ar Jums un nodotu produktu. Pamats: darbības pirms līguma noslēgšanas pēc Jūsu lūguma (VDAR 6. panta 1. punkta b) apakšpunkts).',
+        'Lai aizsargātu mājaslapu pret ļaunprātīgu izmantošanu. Pamats: mūsu leģitīmās intereses (VDAR 6. panta 1. punkta f) apakšpunkts).',
+      ],
+      closing: 'Datus neizmantojam reklāmai un nepārdodam. Bez šiem datiem rezervāciju nevaram apstrādāt.',
+    },
+    {
+      heading: 'Kas var piekļūt datiem',
+      paragraphs: [
+        'Datiem piekļūst mūsu darbinieki, kuri apstrādā rezervācijas, kā arī pakalpojumu sniedzēji, kas nodrošina mājaslapas darbību un e-pasta sūtīšanu: [jānorāda mitināšanas un e-pasta pakalpojumu sniedzēji un, ja dati tiek nodoti ārpus EEZ, kādā veidā].',
+      ],
+    },
+    {
+      heading: 'Cik ilgi mēs glabājam datus',
+      paragraphs: [
+        'Rezervācijas datus glabājam [jānorāda termiņš, piemēram, cik ilgi pēc rezervācijas pabeigšanas], ja vien normatīvie akti neprasa glabāt ilgāk, piemēram, grāmatvedības dokumentus. Notikumu žurnāla ierakstus glabājam [jānorāda termiņš].',
+      ],
+    },
+    {
+      heading: 'Jūsu tiesības',
+      items: [
+        'Saņemt informāciju par saviem datiem un to kopiju.',
+        'Labot neprecīzus datus.',
+        'Lūgt datu dzēšanu vai apstrādes ierobežošanu.',
+        'Iebilst pret apstrādi, kas balstīta uz leģitīmajām interesēm.',
+        'Saņemt savus datus pārnesamā formātā.',
+      ],
+      closing: 'Lai izmantotu šīs tiesības, rakstiet uz info@xenonfix.lv. Jums ir arī tiesības iesniegt sūdzību Datu valsts inspekcijā (www.dvi.gov.lv).',
+    },
+    {
+      heading: 'Sīkdatnes',
+      paragraphs: ['Mājaslapas publiskajā daļā mēs neizmantojam analītikas vai reklāmas sīkdatnes.'],
+    },
+  ],
 };
