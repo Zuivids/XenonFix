@@ -153,7 +153,7 @@ describe('App', () => {
     expect(link('link[hreflang="ru"]')).toEqual(['https://xenonfix.lv/ru/par-mums']);
     expect(link('link[hreflang="en"]')).toEqual(['https://xenonfix.lv/en/par-mums']);
     expect(link('link[hreflang="x-default"]')).toEqual(['https://xenonfix.lv/par-mums']);
-    expect(document.title).toBe('О нас — XenonFix');
+    expect(document.title).toBe('О нас - XenonFix');
   });
 
   it('shows products on the store page and links to them in the current language', async () => {
@@ -191,7 +191,7 @@ describe('App', () => {
     expect(root.querySelector('h1')?.textContent).toBe('Audi A4 lukturis');
     expect(root.querySelector('app-reservation-form')).not.toBeNull();
     expect(root.textContent).toContain('8K0941003');
-    expect(document.title).toBe('Audi A4 lukturis — XenonFix');
+    expect(document.title).toBe('Audi A4 lukturis - XenonFix');
     expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toBe(
       'Kreisais lukturis. Labā stāvoklī.',
     );
@@ -214,7 +214,7 @@ describe('App', () => {
     const root = (await appAt('/product/nav-tada')).nativeElement as HTMLElement;
 
     expect(root.querySelector('h1')?.textContent).toBe('Lapa nav atrasta');
-    expect(document.title).toBe('Lapa nav atrasta — XenonFix');
+    expect(document.title).toBe('Lapa nav atrasta - XenonFix');
   });
 
   it('does not call a product missing when the backend has a problem', async () => {
@@ -225,7 +225,7 @@ describe('App', () => {
 
     expect(root.querySelector('h1')?.textContent).toBe('Veikals');
     expect(root.querySelector('[role="alert"]')?.textContent).toContain('nav pieejams');
-    expect(document.title).toBe('Veikals — XenonFix');
+    expect(document.title).toBe('Veikals - XenonFix');
     api.get = STUB_API.get!;
   });
 

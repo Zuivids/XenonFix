@@ -1,15 +1,17 @@
 import { Component, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { errorMessage } from '../admin-errors';
 import { AdminSession } from '../admin-session';
 
 @Component({
   selector: 'app-admin-login',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   template: `
     <main>
-      <img src="logo.png" alt="XenonFix" width="644" height="192" />
+      <a class="logo" routerLink="/" aria-label="XenonFix - uz sākumlapu">
+        <img src="logo.png" alt="" width="644" height="192" />
+      </a>
       <h1>Pieslēgšanās</h1>
       <form [formGroup]="form" (ngSubmit)="submit()">
         <label>

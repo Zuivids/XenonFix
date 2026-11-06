@@ -54,7 +54,7 @@ export class SeoTitleStrategy extends TitleStrategy {
     const product = lookup?.state === 'found' ? lookup.product : null;
     // A backend problem does not mean the product is gone, so it is not called "not found"
     const titleKey = lookup?.state === 'unavailable' ? 'store.title' : (route.title as MessageKey);
-    this.title.setTitle(product ? `${product.name} — XenonFix` : this.i18n.t(titleKey));
+    this.title.setTitle(product ? `${product.name} - XenonFix` : this.i18n.t(titleKey));
     this.meta.updateTag({
       name: 'description',
       content: product

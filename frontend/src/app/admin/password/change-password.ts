@@ -38,6 +38,15 @@ const MIN_PASSWORD_LENGTH = 12;
     </form>
   `,
   styleUrl: '../admin.css',
+  // A single short form, so it sits in the middle like the login page
+  styles: `
+    :host {
+      display: block;
+      max-width: 24rem;
+      margin: 0 auto;
+      padding-top: 1rem;
+    }
+  `,
 })
 export class ChangePassword {
   private readonly session = inject(AdminSession);

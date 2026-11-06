@@ -146,7 +146,7 @@ describe('Admin panel', () => {
 
     expect(document.head.querySelector('meta[name="robots"]')?.getAttribute('content')).toBe('noindex');
     expect(document.head.querySelector('link[rel="canonical"]')).toBeNull();
-    expect(document.title).toBe('Pieslēgšanās — XenonFix');
+    expect(document.title).toBe('Pieslēgšanās - XenonFix');
 
     await router.navigateByUrl('/');
 
