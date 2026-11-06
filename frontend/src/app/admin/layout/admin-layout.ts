@@ -11,6 +11,7 @@ import { AdminSession } from '../admin-session';
       @if (session.me(); as me) {
         <nav aria-label="Administrēšana">
           @if (!passwordChangeRequired()) {
+            <a routerLink="/admin/reservations" routerLinkActive="active">Rezervācijas</a>
             <a routerLink="/admin/products" routerLinkActive="active">Produkti</a>
             <a routerLink="/admin/admins" routerLinkActive="active">Administratori</a>
             <a routerLink="/admin/audit" routerLinkActive="active">Notikumu žurnāls</a>

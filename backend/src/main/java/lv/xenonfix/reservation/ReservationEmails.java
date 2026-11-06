@@ -48,6 +48,16 @@ class ReservationEmails {
 		sendToCustomer(reservation);
 	}
 
+	@Async
+	@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+	void onStatusChanged(ReservationStatusChanged change) {
+		send(change.reference(), "status", (message) -> {
+			message.setTo(change.customerEmail());
+			message.setSubject(StatusTexts.subject(change));
+			message.setText(StatusTexts.body(change), false);
+		});
+	}
+
 	private void sendToCustomer(ReservationCreated reservation) {
 		send(reservation.reference(), "customer", (message) -> {
 			message.setTo(reservation.customerEmail());
@@ -112,6 +122,118 @@ class ReservationEmails {
 	private interface MessageContent {
 
 		void fill(MimeMessageHelper message) throws MessagingException;
+
+	}
+
+	/** When an admin confirms or cancels. Admins' notes are not available here, on purpose. */
+	private static final class StatusTexts {
+
+		private static final String CONFIRMED_LV = """
+				Labdien, %1$s!
+
+				Jūsu rezervācija %2$s ir apstiprināta.
+
+				Prece: %3$s
+				Daudzums: %4$d
+
+				Preci varat saņemt mūsu darbnīcā: Bauskas iela 16c, Rīga.
+
+				Jautājumi? Zvaniet +371 288 03 119 vai rakstiet info@xenonfix.lv.
+
+				XenonFix (SIA Elekanga)
+				""";
+
+		private static final String CONFIRMED_RU = """
+				Здравствуйте, %1$s!
+
+				Ваше резервирование %2$s подтверждено.
+
+				Товар: %3$s
+				Количество: %4$d
+
+				Забрать товар можно в нашей мастерской: Bauskas iela 16c, Рига.
+
+				Вопросы? Звоните +371 288 03 119 или пишите info@xenonfix.lv.
+
+				XenonFix (SIA Elekanga)
+				""";
+
+		private static final String CONFIRMED_EN = """
+				Hello %1$s,
+
+				Your reservation %2$s is confirmed.
+
+				Product: %3$s
+				Quantity: %4$d
+
+				You can collect the product from our workshop: Bauskas iela 16c, Riga.
+
+				Questions? Call +371 288 03 119 or write to info@xenonfix.lv.
+
+				XenonFix (SIA Elekanga)
+				""";
+
+		private static final String CANCELLED_LV = """
+				Labdien, %1$s!
+
+				Jūsu rezervācija %2$s ir atcelta.
+
+				Prece: %3$s
+				Daudzums: %4$d
+
+				Ja Jums ir jautājumi, zvaniet +371 288 03 119 vai rakstiet info@xenonfix.lv.
+
+				XenonFix (SIA Elekanga)
+				""";
+
+		private static final String CANCELLED_RU = """
+				Здравствуйте, %1$s!
+
+				Ваше резервирование %2$s отменено.
+
+				Товар: %3$s
+				Количество: %4$d
+
+				Если у вас есть вопросы, звоните +371 288 03 119 или пишите info@xenonfix.lv.
+
+				XenonFix (SIA Elekanga)
+				""";
+
+		private static final String CANCELLED_EN = """
+				Hello %1$s,
+
+				Your reservation %2$s has been cancelled.
+
+				Product: %3$s
+				Quantity: %4$d
+
+				If you have any questions, call +371 288 03 119 or write to info@xenonfix.lv.
+
+				XenonFix (SIA Elekanga)
+				""";
+
+		private StatusTexts() {
+		}
+
+		static String subject(ReservationStatusChanged change) {
+			boolean confirmed = change.status() == ReservationStatus.CONFIRMED;
+			return switch (change.language()) {
+				case lv -> "Rezervācija " + change.reference() + (confirmed ? " apstiprināta" : " atcelta") + " — XenonFix";
+				case ru -> "Резервирование " + change.reference() + (confirmed ? " подтверждено" : " отменено") + " — XenonFix";
+				case en -> "Reservation " + change.reference() + (confirmed ? " confirmed" : " cancelled") + " — XenonFix";
+			};
+		}
+
+		static String body(ReservationStatusChanged change) {
+			boolean confirmed = change.status() == ReservationStatus.CONFIRMED;
+			String template = switch (change.language()) {
+				case lv -> confirmed ? CONFIRMED_LV : CANCELLED_LV;
+				case ru -> confirmed ? CONFIRMED_RU : CANCELLED_RU;
+				case en -> confirmed ? CONFIRMED_EN : CANCELLED_EN;
+			};
+			return template.formatted(change.customerName(), change.reference(), change.productName(),
+					change.quantity());
+		}
 
 	}
 

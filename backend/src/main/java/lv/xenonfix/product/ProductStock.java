@@ -40,6 +40,26 @@ public class ProductStock {
 				ProductPublicService.texts(product, language).name(), product.getPartNumber(), unitPrice);
 	}
 
+	/** Puts back what a cancelled reservation held, in the caller's transaction. */
+	@Transactional(propagation = Propagation.MANDATORY)
+	public void giveBack(long productId, int quantity) {
+		this.products.returnStock(productId, quantity, this.clock.instant());
+	}
+
+	/** Takes the stock of a reopened reservation, in the caller's transaction. */
+	@Transactional(propagation = Propagation.MANDATORY)
+	public void takeAgain(long productId, int quantity) {
+		if (this.products.takeStockAgain(productId, quantity, this.clock.instant()) == 0) {
+			throw new ApiException(HttpStatus.CONFLICT, "OUT_OF_STOCK");
+		}
+	}
+
+	/** The product's name in a language, or the Latvian one if not translated. */
+	@Transactional(propagation = Propagation.MANDATORY)
+	public String nameFor(long productId, ProductLanguage language) {
+		return ProductPublicService.texts(this.products.findById(productId).orElseThrow(), language).name();
+	}
+
 	/**
 	 * @param latvianName the name for the shop
 	 * @param name the name in the language asked for, or the Latvian one if not translated

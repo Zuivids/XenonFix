@@ -324,6 +324,7 @@ export const enContent: Content = {
       heading: 'What data we process',
       items: [
         'When you reserve a product: your name, phone number, email address, any comment you add, and the product and quantity reserved.',
+        'Internal notes by our staff about the reservation, needed to process it.',
         'For security: the time of the reservation and the IP address in our event log, to detect and prevent misuse.',
       ],
     },

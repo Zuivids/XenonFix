@@ -72,7 +72,12 @@ The panel is at `/admin`, in Latvian only, and is not indexed by search engines.
 - **Photos:** JPEG or PNG up to 20 MB, judged by content. Each is turned upright and re-encoded as
   a JPEG of at most 1600 px plus a 600 px thumbnail, which also drops metadata such as GPS. Files
   are in `products/<id>/` under the uploads folder, so back that folder up with the database.
-- **Audit log:** logins, password changes, and changes to admins and products, in `audit_log`.
+- **Reservations:** every reservation with the customer's details, a search and a status filter. Any
+  status can become any other. Stock returns when a reservation is cancelled and is taken again when
+  it is reopened, which is refused if not enough is left. The customer gets an email when it is
+  confirmed or cancelled, but not for corrections to a completed one. Notes are for admins only: they
+  are never in public responses, emails or the audit log.
+- **Audit log:** logins, password changes, and changes to admins, products and reservations, in `audit_log`.
   Never write passwords to it. Later features add their own event types.
 
 MFA is left out for now. To add it: create a table for the admins' secrets, make the login answer
@@ -92,7 +97,7 @@ that is not translated falls back to Latvian.
 - **Stock** is taken when the reservation is made, in one conditional `UPDATE`, so two customers
   cannot get the last piece. The same statement raises the product's version, so an admin's product
   form opened earlier is refused rather than putting the old stock back. It stays taken until an
-  admin handles the reservation.
+  admin cancels the reservation.
 - **Emails** go to the customer, in their language, and to the shop (`APP_MAIL_SHOP`), after the
   reservation is saved and in the background. A mail problem never loses a reservation, but a failed
   email is not sent again; the log has the reference only.

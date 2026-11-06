@@ -29,6 +29,16 @@ export const adminRoutes: Routes = [
         loadComponent: () => import('./products/product-form').then((m) => m.ProductForm),
       },
       {
+        path: 'reservations',
+        title: 'Rezervācijas — XenonFix',
+        loadComponent: () => import('./reservations/reservation-list').then((m) => m.ReservationList),
+      },
+      {
+        path: 'reservations/:id',
+        title: 'Rezervācija — XenonFix',
+        loadComponent: () => import('./reservations/reservation-detail').then((m) => m.ReservationDetail),
+      },
+      {
         path: 'admins',
         title: 'Administratori — XenonFix',
         loadComponent: () => import('./admins/admin-list').then((m) => m.AdminList),

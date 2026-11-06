@@ -48,4 +48,19 @@ interface ProductRepository extends JpaRepository<Product, Long> {
 				and p.stockQuantity >= :quantity""")
 	int takeStock(String slug, int quantity, Instant now);
 
+	/** Like {@link #takeStock}, for a reservation reopened by an admin: the product's status does not matter. */
+	@Modifying(clearAutomatically = true)
+	@Query("""
+			update Product p
+			set p.stockQuantity = p.stockQuantity - :quantity, p.version = p.version + 1, p.updatedAt = :now
+			where p.id = :id and p.stockQuantity >= :quantity""")
+	int takeStockAgain(long id, int quantity, Instant now);
+
+	@Modifying(clearAutomatically = true)
+	@Query("""
+			update Product p
+			set p.stockQuantity = p.stockQuantity + :quantity, p.version = p.version + 1, p.updatedAt = :now
+			where p.id = :id""")
+	int returnStock(long id, int quantity, Instant now);
+
 }

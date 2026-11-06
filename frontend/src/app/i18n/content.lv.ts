@@ -327,6 +327,7 @@ export const lvContent: Content = {
       heading: 'Kādus datus mēs apstrādājam',
       items: [
         'Rezervējot produktu: vārdu un uzvārdu, tālruņa numuru, e-pasta adresi, komentāru, ja to norādāt, kā arī rezervēto produktu un daudzumu.',
+        'Mūsu darbinieku iekšējās piezīmes par rezervāciju, kas nepieciešamas tās apstrādei.',
         'Drošībai: rezervācijas laiku un IP adresi notikumu žurnālā, lai varētu atklāt un novērst ļaunprātīgu izmantošanu.',
       ],
     },

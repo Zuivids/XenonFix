@@ -51,6 +51,9 @@ class Reservation {
 	@Column(length = 1000)
 	private String comment;
 
+	@Column(name = "admin_note", length = 2000)
+	private String adminNote;
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 2)
 	private ProductLanguage language;
@@ -100,6 +103,80 @@ class Reservation {
 	/** What the customer and the shop call this reservation. */
 	String getReference() {
 		return String.format(Locale.ROOT, "XF-%06d", this.id);
+	}
+
+	void changeStatus(ReservationStatus status, Instant now) {
+		this.status = status;
+		this.updatedAt = now;
+	}
+
+	void changeAdminNote(String adminNote, Instant now) {
+		this.adminNote = adminNote;
+		this.updatedAt = now;
+	}
+
+	BigDecimal getTotal() {
+		return this.unitPrice.multiply(BigDecimal.valueOf(this.quantity));
+	}
+
+	long getProductId() {
+		return this.productId;
+	}
+
+	String getProductName() {
+		return this.productName;
+	}
+
+	String getPartNumber() {
+		return this.partNumber;
+	}
+
+	BigDecimal getUnitPrice() {
+		return this.unitPrice;
+	}
+
+	int getQuantity() {
+		return this.quantity;
+	}
+
+	String getCustomerName() {
+		return this.customerName;
+	}
+
+	String getCustomerPhone() {
+		return this.customerPhone;
+	}
+
+	String getCustomerEmail() {
+		return this.customerEmail;
+	}
+
+	String getComment() {
+		return this.comment;
+	}
+
+	String getAdminNote() {
+		return this.adminNote;
+	}
+
+	ProductLanguage getLanguage() {
+		return this.language;
+	}
+
+	ReservationStatus getStatus() {
+		return this.status;
+	}
+
+	Instant getCreatedAt() {
+		return this.createdAt;
+	}
+
+	Instant getUpdatedAt() {
+		return this.updatedAt;
+	}
+
+	long getVersion() {
+		return this.version;
 	}
 
 }
