@@ -22,9 +22,9 @@ import org.springframework.web.util.UrlPathHelper;
  * Limits POST requests to the given paths, per client IP.
  *
  * <p>
- * Uses the connection's remote address. Behind a reverse proxy this is the proxy's
- * address until forwarded headers are configured; until then every client would share one
- * limit.
+ * Uses the request's remote address. On the server that is the visitor's, taken from
+ * X-Forwarded-For by Tomcat (see application-prod.yml); without that every visitor would have
+ * Caddy's address and share one limit.
  */
 public class RateLimitFilter extends OncePerRequestFilter {
 

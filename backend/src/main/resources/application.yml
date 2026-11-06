@@ -63,6 +63,9 @@ app:
     rate-limit:
       limit: 5
       window: 10m
+    # After this the customer's details are erased from cancelled and completed reservations,
+    # every night. The privacy policy states the same period ("6 months"): change both together.
+    retention: 183d
   mail:
     from: ${APP_MAIL_FROM:info@xenonfix.lv}
     shop: ${APP_MAIL_SHOP:info@xenonfix.lv}

@@ -26,6 +26,8 @@ const EVENT_NAMES: Record<string, string> = {
   RESERVATION_CREATED: 'Jauna rezervācija',
   RESERVATION_STATUS_CHANGED: 'Mainīts rezervācijas statuss',
   RESERVATION_NOTE_CHANGED: 'Mainītas rezervācijas piezīmes',
+  RESERVATION_ANONYMIZED: 'Dzēsti klienta dati',
+  RESERVATIONS_EXPIRED: 'Automātiski dzēsti veci klientu dati',
 };
 
 @Component({

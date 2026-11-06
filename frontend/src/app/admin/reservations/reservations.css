@@ -94,6 +94,22 @@ textarea {
   resize: vertical;
 }
 
+.erased {
+  color: #555;
+  font-style: italic;
+}
+
+section.erase {
+  max-width: 40rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ddd;
+}
+
+section.erase .hint {
+  margin-top: 0;
+}
+
 form.note .actions {
   align-items: center;
   margin: 0;

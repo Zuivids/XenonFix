@@ -122,4 +122,20 @@ class StoreTests {
 		this.mvc.perform(get("/api/store/products").param("lang", "de")).andExpect(status().isBadRequest());
 	}
 
+	@Test
+	void theSitemapListsOnlyPublishedProducts() throws Exception {
+		TestProducts.Created published = this.products.published(0);
+		TestProducts.Created draft = this.products.draft("Melnraksts " + TestProducts.unique(), 1, "null", "");
+		TestProducts.Created archived = this.products.published(1);
+		this.products.changeStatus(archived.id(), "ARCHIVED");
+
+		this.mvc.perform(get("/api/store/sitemap"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$[*].slug", Matchers.hasItem(published.slug())))
+			.andExpect(jsonPath("$[*].slug", Matchers.not(Matchers.hasItem(draft.slug()))))
+			.andExpect(jsonPath("$[*].slug", Matchers.not(Matchers.hasItem(archived.slug()))))
+			.andExpect(jsonPath("$[0].updatedAt").exists())
+			.andExpect(jsonPath("$[0].stockQuantity").doesNotExist());
+	}
+
 }

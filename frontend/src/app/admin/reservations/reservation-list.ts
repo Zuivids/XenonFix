@@ -61,8 +61,12 @@ import { RESERVATION_STATUS_NAMES, ReservationApi, ReservationPage, ReservationS
                   <td>{{ reservation.productName }}</td>
                   <td>{{ reservation.quantity }}</td>
                   <td class="nowrap">{{ reservation.total | number: '1.2-2' }} €</td>
-                  <td>{{ reservation.customerName }}</td>
-                  <td class="nowrap">{{ reservation.customerPhone }}</td>
+                  @if (reservation.anonymized) {
+                    <td class="erased" colspan="2">Dati dzēsti</td>
+                  } @else {
+                    <td>{{ reservation.customerName }}</td>
+                    <td class="nowrap">{{ reservation.customerPhone }}</td>
+                  }
                   <td class="nowrap">
                     <span [class]="'status status-' + reservation.status">{{ statusNames[reservation.status] }}</span>
                   </td>

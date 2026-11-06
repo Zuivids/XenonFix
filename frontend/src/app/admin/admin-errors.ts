@@ -11,6 +11,8 @@ const MESSAGES: Record<string, string> = {
   CHANGED_BY_ANOTHER: 'Kāds cits tikko mainīja šo ierakstu. Pārlādējiet lapu un pārbaudiet izmaiņas.',
   OUT_OF_STOCK: 'Atlikumā nepietiek preču, lai atjaunotu šo rezervāciju.',
   RESERVATION_NOT_FOUND: 'Rezervācija nav atrasta.',
+  RESERVATION_ACTIVE: 'Klienta datus var dzēst tikai atceltai vai pabeigtai rezervācijai.',
+  RESERVATION_ANONYMIZED: 'Šīs rezervācijas klienta dati ir dzēsti, tāpēc to vairs nevar mainīt.',
   SLUG_TAKEN: 'Šāda lapas adrese jau ir citam produktam.',
   SALE_PRICE_NOT_LOWER: 'Akcijas cenai jābūt zemākai par cenu.',
   LATVIAN_NAME_REQUIRED: 'Latviskais nosaukums ir obligāts.',

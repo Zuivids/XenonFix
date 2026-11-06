@@ -26,7 +26,11 @@ public record AppProperties(Path uploadsPath, BootstrapAdmin bootstrapAdmin, Loc
 	public record Session(Duration idle, Duration absolute) {
 	}
 
-	public record Reservation(RateLimit rateLimit) {
+	/**
+	 * @param retention how long after its last change a cancelled or completed reservation keeps
+	 * the customer's details; the privacy policy states the same period
+	 */
+	public record Reservation(RateLimit rateLimit, Duration retention) {
 	}
 
 	/**

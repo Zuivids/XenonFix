@@ -75,8 +75,7 @@ class ReservationAdminService {
 	 */
 	@Transactional
 	ReservationDetailResponse changeStatus(long id, ReservationStatus status, long version, Actor actor) {
-		Reservation reservation = find(id);
-		checkVersion(reservation, version);
+		Reservation reservation = findChangeable(id, version);
 		ReservationStatus oldStatus = reservation.getStatus();
 		if (status == oldStatus) {
 			return toDetail(reservation);
@@ -97,8 +96,7 @@ class ReservationAdminService {
 
 	@Transactional
 	ReservationDetailResponse changeNote(long id, String note, long version, Actor actor) {
-		Reservation reservation = find(id);
-		checkVersion(reservation, version);
+		Reservation reservation = findChangeable(id, version);
 		String newNote = StringUtils.hasText(note) ? note.strip() : null;
 		if (Objects.equals(newNote, reservation.getAdminNote())) {
 			return toDetail(reservation);
@@ -107,6 +105,23 @@ class ReservationAdminService {
 		reservation = this.reservations.saveAndFlush(reservation);
 		// Only that it changed: the text may hold personal details
 		record(AuditEventType.RESERVATION_NOTE_CHANGED, reservation, actor, reservation.getReference());
+		return toDetail(reservation);
+	}
+
+	/**
+	 * Erases the customer's details for good, for a customer who asks. Only for a finished
+	 * reservation, so stock is never held for someone the shop can no longer contact.
+	 */
+	@Transactional
+	ReservationDetailResponse anonymize(long id, long version, Actor actor) {
+		Reservation reservation = findChangeable(id, version);
+		if (reservation.getStatus() != ReservationStatus.CANCELLED
+				&& reservation.getStatus() != ReservationStatus.COMPLETED) {
+			throw new ApiException(HttpStatus.CONFLICT, "RESERVATION_ACTIVE");
+		}
+		reservation.anonymize(this.clock.instant());
+		reservation = this.reservations.saveAndFlush(reservation);
+		record(AuditEventType.RESERVATION_ANONYMIZED, reservation, actor, reservation.getReference());
 		return toDetail(reservation);
 	}
 
@@ -137,10 +152,19 @@ class ReservationAdminService {
 			.orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "RESERVATION_NOT_FOUND"));
 	}
 
-	private static void checkVersion(Reservation reservation, long version) {
+	/**
+	 * An anonymized reservation stays as it is: reopening it would hold stock for nobody, and
+	 * there is nobody left to email.
+	 */
+	private Reservation findChangeable(long id, long version) {
+		Reservation reservation = find(id);
 		if (version != reservation.getVersion()) {
 			throw new ApiException(HttpStatus.CONFLICT, "CHANGED_BY_ANOTHER");
 		}
+		if (reservation.isAnonymized()) {
+			throw new ApiException(HttpStatus.CONFLICT, "RESERVATION_ANONYMIZED");
+		}
+		return reservation;
 	}
 
 	private void record(AuditEventType type, Reservation reservation, Actor actor, String details) {
@@ -162,7 +186,7 @@ class ReservationAdminService {
 		return new ReservationSummaryResponse(reservation.getId(), reservation.getReference(),
 				reservation.getProductName(), reservation.getQuantity(), reservation.getTotal(),
 				reservation.getCustomerName(), reservation.getCustomerPhone(), reservation.getStatus(),
-				reservation.getCreatedAt());
+				reservation.getCreatedAt(), reservation.isAnonymized());
 	}
 
 	private static ReservationDetailResponse toDetail(Reservation reservation) {
@@ -172,7 +196,7 @@ class ReservationAdminService {
 				reservation.getCustomerName(), reservation.getCustomerPhone(), reservation.getCustomerEmail(),
 				reservation.getComment(), reservation.getAdminNote(), reservation.getLanguage(),
 				reservation.getStatus(), reservation.getCreatedAt(), reservation.getUpdatedAt(),
-				reservation.getVersion());
+				reservation.getAnonymizedAt(), reservation.getVersion());
 	}
 
 	record Actor(long adminId, String ipAddress) {

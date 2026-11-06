@@ -1,0 +1,19 @@
+# The server, behind Caddy (compose.prod.yaml). SPRING_PROFILES_ACTIVE=prod sets it.
+
+spring:
+  mail:
+    # Host, port, username and password come from SPRING_MAIL_* in the server's .env
+    # Both stay true on the real server; only a trial run against a mail catcher turns them off
+    properties:
+      mail.smtp.auth: ${MAIL_AUTH:true}
+      mail.smtp.starttls.enable: ${MAIL_STARTTLS:true}
+      # Never fall back to sending the password unencrypted
+      mail.smtp.starttls.required: ${MAIL_STARTTLS:true}
+
+server:
+  # The visitor's address comes from X-Forwarded-For, which Caddy sets, and https from
+  # X-Forwarded-Proto. Tomcat trusts these only from private network addresses, which is Caddy
+  # on the Docker network. The backend's port is never published, so nobody else can reach it
+  # to send a made-up address. Rate limits, lockouts and the audit log depend on this.
+  forward-headers-strategy: native
+  shutdown: graceful

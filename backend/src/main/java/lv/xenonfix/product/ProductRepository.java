@@ -1,7 +1,10 @@
 package lv.xenonfix.product;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
+
+import lv.xenonfix.product.dto.StoreSitemapEntry;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +35,12 @@ interface ProductRepository extends JpaRepository<Product, Long> {
 	Optional<Product> findBySlugAndStatus(String slug, ProductStatus status);
 
 	boolean existsBySlugAndStatus(String slug, ProductStatus status);
+
+	@Query("""
+			select new lv.xenonfix.product.dto.StoreSitemapEntry(p.slug, p.updatedAt) from Product p
+			where p.status = lv.xenonfix.product.ProductStatus.PUBLISHED
+			order by p.id""")
+	List<StoreSitemapEntry> findSitemapEntries();
 
 	/**
 	 * Takes stock in one statement, so the database decides who gets the last one when several

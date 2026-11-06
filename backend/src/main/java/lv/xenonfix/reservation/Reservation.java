@@ -39,13 +39,14 @@ class Reservation {
 	@Column(nullable = false)
 	private int quantity;
 
-	@Column(name = "customer_name", nullable = false, length = 100)
+	// The customer's details are empty once anonymized
+	@Column(name = "customer_name", length = 100)
 	private String customerName;
 
-	@Column(name = "customer_phone", nullable = false, length = 30)
+	@Column(name = "customer_phone", length = 30)
 	private String customerPhone;
 
-	@Column(name = "customer_email", nullable = false, length = 254)
+	@Column(name = "customer_email", length = 254)
 	private String customerEmail;
 
 	@Column(length = 1000)
@@ -64,6 +65,9 @@ class Reservation {
 
 	@Column(name = "privacy_accepted_at", nullable = false)
 	private Instant privacyAcceptedAt;
+
+	@Column(name = "anonymized_at")
+	private Instant anonymizedAt;
 
 	@Column(name = "created_at", nullable = false)
 	private Instant createdAt;
@@ -113,6 +117,25 @@ class Reservation {
 	void changeAdminNote(String adminNote, Instant now) {
 		this.adminNote = adminNote;
 		this.updatedAt = now;
+	}
+
+	/** Erases everything about the customer, including notes, which may name them. */
+	void anonymize(Instant now) {
+		this.customerName = null;
+		this.customerPhone = null;
+		this.customerEmail = null;
+		this.comment = null;
+		this.adminNote = null;
+		this.anonymizedAt = now;
+		this.updatedAt = now;
+	}
+
+	boolean isAnonymized() {
+		return this.anonymizedAt != null;
+	}
+
+	Instant getAnonymizedAt() {
+		return this.anonymizedAt;
 	}
 
 	BigDecimal getTotal() {

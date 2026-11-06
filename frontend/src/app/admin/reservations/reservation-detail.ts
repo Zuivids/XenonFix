@@ -40,36 +40,46 @@ const NOTE_LENGTH = 2000;
         <span [class]="'status status-' + item.status">{{ statusNames[item.status] }}</span>
       </div>
 
-      <section class="status-actions" aria-label="Mainīt statusu">
-        @for (action of actions(); track action.status) {
-          <button
-            type="button"
-            [class.secondary]="action.status !== 'CONFIRMED'"
-            [disabled]="busy()"
-            (click)="changeStatus(action.status)"
-          >
-            {{ action.label }}
-          </button>
-        }
-      </section>
+      @if (!item.anonymizedAt) {
+        <section class="status-actions" aria-label="Mainīt statusu">
+          @for (action of actions(); track action.status) {
+            <button
+              type="button"
+              [class.secondary]="action.status !== 'CONFIRMED'"
+              [disabled]="busy()"
+              (click)="changeStatus(action.status)"
+            >
+              {{ action.label }}
+            </button>
+          }
+        </section>
+      }
 
       <div class="columns">
         <section>
           <h2>Klients</h2>
-          <dl>
-            <dt>Vārds</dt>
-            <dd>{{ item.customerName }}</dd>
-            <dt>Telefons</dt>
-            <dd><a [href]="'tel:' + phoneLink(item.customerPhone)">{{ item.customerPhone }}</a></dd>
-            <dt>E-pasts</dt>
-            <dd><a [href]="'mailto:' + item.customerEmail">{{ item.customerEmail }}</a></dd>
-            <dt>Valoda</dt>
-            <dd>{{ languageNames[item.language] }}</dd>
-            @if (item.comment) {
-              <dt>Komentārs</dt>
-              <dd class="text">{{ item.comment }}</dd>
-            }
-          </dl>
+          @if (item.anonymizedAt) {
+            <p class="erased">Klienta dati dzēsti {{ item.anonymizedAt | date: 'dd.MM.yyyy' }}.</p>
+            <dl>
+              <dt>Valoda</dt>
+              <dd>{{ languageNames[item.language] }}</dd>
+            </dl>
+          } @else {
+            <dl>
+              <dt>Vārds</dt>
+              <dd>{{ item.customerName }}</dd>
+              <dt>Telefons</dt>
+              <dd><a [href]="'tel:' + phoneLink(item.customerPhone ?? '')">{{ item.customerPhone }}</a></dd>
+              <dt>E-pasts</dt>
+              <dd><a [href]="'mailto:' + item.customerEmail">{{ item.customerEmail }}</a></dd>
+              <dt>Valoda</dt>
+              <dd>{{ languageNames[item.language] }}</dd>
+              @if (item.comment) {
+                <dt>Komentārs</dt>
+                <dd class="text">{{ item.comment }}</dd>
+              }
+            </dl>
+          }
         </section>
 
         <section>
@@ -95,25 +105,40 @@ const NOTE_LENGTH = 2000;
         </section>
       </div>
 
-      <form class="note" (ngSubmit)="saveNote()">
-        <label>
-          Piezīmes
-          <textarea
-            name="note"
-            rows="4"
-            [maxLength]="noteLength"
-            [ngModel]="note()"
-            (ngModelChange)="note.set($event)"
-          ></textarea>
-        </label>
-        <p class="hint">Redzamas tikai administratoriem. Klients tās neredz.</p>
-        <p class="actions">
-          <button type="submit" class="secondary" [disabled]="busy() || !noteChanged()">Saglabāt piezīmes</button>
-          @if (noteSaved()) {
-            <span role="status">Saglabāts.</span>
+      @if (!item.anonymizedAt) {
+        <form class="note" (ngSubmit)="saveNote()">
+          <label>
+            Piezīmes
+            <textarea
+              name="note"
+              rows="4"
+              [maxLength]="noteLength"
+              [ngModel]="note()"
+              (ngModelChange)="note.set($event)"
+            ></textarea>
+          </label>
+          <p class="hint">Redzamas tikai administratoriem. Klients tās neredz.</p>
+          <p class="actions">
+            <button type="submit" class="secondary" [disabled]="busy() || !noteChanged()">Saglabāt piezīmes</button>
+            @if (noteSaved()) {
+              <span role="status">Saglabāts.</span>
+            }
+          </p>
+        </form>
+
+        <section class="erase">
+          <h2>Klienta datu dzēšana</h2>
+          @if (item.status === 'CANCELLED' || item.status === 'COMPLETED') {
+            <p class="hint">
+              Ja klients lūdz dzēst savus datus. Tiks dzēsts vārds, telefons, e-pasts, komentārs un piezīmes. Rezervācijas
+              numurs, produkts un summa paliks. To nevar atsaukt.
+            </p>
+            <button type="button" class="secondary" [disabled]="busy()" (click)="anonymize()">Dzēst klienta datus</button>
+          } @else {
+            <p class="hint">Klienta datus var dzēst, kad rezervācija ir atcelta vai pabeigta.</p>
           }
-        </p>
-      </form>
+        </section>
+      }
     }
   `,
   styleUrls: ['../admin.css', './reservations.css'],
@@ -158,6 +183,16 @@ export class ReservationDetail implements OnInit {
       return;
     }
     await this.run(() => this.api.changeStatus(item.id, status, item.version));
+  }
+
+  protected async anonymize(): Promise<void> {
+    const item = this.reservation()!;
+    if (!window.confirm(`Dzēst ${item.reference} klienta datus? To nevar atsaukt.`)) {
+      return;
+    }
+    if (await this.run(() => this.api.anonymize(item.id, item.version))) {
+      this.note.set('');
+    }
   }
 
   protected async saveNote(): Promise<void> {

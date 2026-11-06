@@ -6,23 +6,39 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
+import { oldAddressAnswer } from './server/old-addresses';
+import { SitemapProducts, sitemapXml } from './server/sitemap';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+// Caddy in front sets these. The host is still checked against allowedHosts.
+const angularApp = new AngularNodeAppEngine({
+  trustProxyHeaders: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto'],
+});
+const sitemapProducts = new SitemapProducts(process.env['BACKEND_URL'] || 'http://localhost:8090');
 
-/**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/{*splat}', (req, res) => {
- *   // Handle API request
- * });
- * ```
- */
+/** Old site addresses, before anything else, so a stale link never shows the wrong page. */
+app.use((req, res, next) => {
+  const answer = oldAddressAnswer(req.originalUrl);
+  if (!answer) {
+    next();
+  } else if (answer.status === 301) {
+    res.redirect(301, answer.location);
+  } else {
+    res.status(410).type('text/plain').send('Gone');
+  }
+});
+
+app.get('/sitemap.xml', async (_req, res) => {
+  try {
+    const xml = sitemapXml(await sitemapProducts.get());
+    res.type('application/xml').set('Cache-Control', 'public, max-age=600').send(xml);
+  } catch (error) {
+    console.error('Sitemap: the backend did not answer', error);
+    res.status(503).set('Retry-After', '600').type('text/plain').send('Try again later');
+  }
+});
 
 /**
  * Serve static files from /browser

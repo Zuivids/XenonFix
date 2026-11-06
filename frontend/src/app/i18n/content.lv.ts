@@ -348,7 +348,7 @@ export const lvContent: Content = {
     {
       heading: 'Cik ilgi mēs glabājam datus',
       paragraphs: [
-        'Rezervācijas datus glabājam [jānorāda termiņš, piemēram, cik ilgi pēc rezervācijas pabeigšanas], ja vien normatīvie akti neprasa glabāt ilgāk, piemēram, grāmatvedības dokumentus. Notikumu žurnāla ierakstus glabājam [jānorāda termiņš].',
+        'Jūsu kontaktinformāciju rezervācijā glabājam 6 mēnešus pēc tam, kad rezervācija ir pabeigta vai atcelta, un tad to automātiski dzēšam. Rezervācijas numuru, preci un summu paturam ilgāk, ja to prasa normatīvie akti, piemēram, grāmatvedības dokumentiem. Notikumu žurnāla ierakstus glabājam [jānorāda termiņš].',
       ],
     },
     {

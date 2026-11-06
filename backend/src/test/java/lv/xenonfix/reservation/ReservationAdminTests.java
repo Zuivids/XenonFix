@@ -63,6 +63,9 @@ class ReservationAdminTests {
 	@Autowired
 	private RecordingMailSender mailSender;
 
+	@Autowired
+	private ReservationRetention retention;
+
 	private TestAdmins testAdmins;
 
 	private MockHttpSession session;
@@ -385,6 +388,133 @@ class ReservationAdminTests {
 
 		await().atMost(EMAIL_WAIT).until(() -> emails(reference).size() == 3);
 		assertThat(emails(reference)).noneMatch((email) -> email.body().contains("Slepena piezīme"));
+	}
+
+	@Test
+	void anonymizingErasesTheCustomerAndKeepsTheRest() throws Exception {
+		TestProducts.Created product = this.products.published(5);
+		long id = reserve(product, 2, "lv");
+		note(id, "Slepena piezīme", version(id)).andExpect(status().isOk());
+		change(id, "COMPLETED").andExpect(status().isOk());
+
+		anonymize(id, version(id)).andExpect(status().isOk())
+			.andExpect(jsonPath("$.anonymizedAt").exists())
+			.andExpect(jsonPath("$.customerName").doesNotExist());
+
+		var row = this.jdbcClient
+			.sql("SELECT customer_name, customer_phone, customer_email, comment, admin_note, quantity, status"
+					+ " FROM reservation WHERE id = ?")
+			.param(id)
+			.query()
+			.singleRow();
+		assertThat(row).containsEntry("customer_name", null)
+			.containsEntry("customer_phone", null)
+			.containsEntry("customer_email", null)
+			.containsEntry("comment", null)
+			.containsEntry("admin_note", null)
+			.containsEntry("quantity", 2)
+			.containsEntry("status", "COMPLETED");
+		assertThat(stock(product.id())).isEqualTo(3);
+		assertThat(audit("RESERVATION_ANONYMIZED", id)).containsExactly(reference(id));
+		this.mvc.perform(get(BASE).param("search", reference(id)).session(this.session))
+			.andExpect(jsonPath("$.items[0].anonymized").value(true))
+			.andExpect(jsonPath("$.items[0].customerName").doesNotExist());
+	}
+
+	@ParameterizedTest
+	@CsvSource({ "PENDING", "CONFIRMED" })
+	void onlyFinishedReservationsCanBeAnonymized(String status) throws Exception {
+		long id = reserve(this.products.published(5), 1, "lv");
+		if (!status.equals("PENDING")) {
+			change(id, status).andExpect(status().isOk());
+		}
+
+		anonymize(id, version(id)).andExpect(status().isConflict())
+			.andExpect(jsonPath("$.code").value("RESERVATION_ACTIVE"));
+
+		this.mvc.perform(get(BASE + "/" + id).session(this.session))
+			.andExpect(jsonPath("$.customerName").value("Anna Bērziņa"));
+	}
+
+	@Test
+	void anAnonymizedReservationCannotBeChanged() throws Exception {
+		TestProducts.Created product = this.products.published(5);
+		long id = reserve(product, 1, "lv");
+		change(id, "CANCELLED").andExpect(status().isOk());
+		anonymize(id, version(id)).andExpect(status().isOk());
+
+		change(id, "CONFIRMED").andExpect(status().isConflict())
+			.andExpect(jsonPath("$.code").value("RESERVATION_ANONYMIZED"));
+		note(id, "Teksts", version(id)).andExpect(status().isConflict());
+		anonymize(id, version(id)).andExpect(status().isConflict());
+
+		assertThat(stock(product.id())).isEqualTo(5);
+	}
+
+	@Test
+	void anonymizingWithAnOldVersionIsRefused() throws Exception {
+		long id = reserve(this.products.published(5), 1, "lv");
+		long old = version(id);
+		change(id, "CANCELLED").andExpect(status().isOk());
+
+		anonymize(id, old).andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("CHANGED_BY_ANOTHER"));
+		send(post(BASE + "/" + id + "/anonymize"), "{}").andExpect(status().isBadRequest());
+	}
+
+	@Test
+	void theNightlyJobAnonymizesOnlyOldFinishedReservations() throws Exception {
+		TestProducts.Created product = this.products.published(10);
+		long oldCompleted = reserve(product, 1, "lv");
+		long oldCancelled = reserve(product, 1, "lv");
+		long oldPending = reserve(product, 1, "lv");
+		long oldConfirmed = reserve(product, 1, "lv");
+		long recentCompleted = reserve(product, 1, "lv");
+		change(oldCompleted, "COMPLETED").andExpect(status().isOk());
+		change(oldCancelled, "CANCELLED").andExpect(status().isOk());
+		change(oldConfirmed, "CONFIRMED").andExpect(status().isOk());
+		change(recentCompleted, "COMPLETED").andExpect(status().isOk());
+		// The period is 183 days; a day either side, so time zones cannot matter
+		for (long id : List.of(oldCompleted, oldCancelled, oldPending, oldConfirmed)) {
+			setUpdatedDaysAgo(id, 185);
+		}
+		setUpdatedDaysAgo(recentCompleted, 181);
+		int stockBefore = stock(product.id());
+
+		this.retention.run();
+
+		assertThat(customerName(oldCompleted)).isNull();
+		assertThat(customerName(oldCancelled)).isNull();
+		assertThat(customerName(oldPending)).isEqualTo("Anna Bērziņa");
+		assertThat(customerName(oldConfirmed)).isEqualTo("Anna Bērziņa");
+		assertThat(customerName(recentCompleted)).isEqualTo("Anna Bērziņa");
+		assertThat(stock(product.id())).isEqualTo(stockBefore);
+		List<String> expired = this.jdbcClient
+			.sql("SELECT details FROM audit_log WHERE event_type = 'RESERVATIONS_EXPIRED' AND admin_id IS NULL"
+					+ " ORDER BY id DESC LIMIT 1")
+			.query(String.class)
+			.list();
+		assertThat(expired).singleElement().asString().contains("dati 2 rezervācijām").doesNotContain("Anna");
+
+		this.retention.run();
+		assertThat(customerName(oldPending)).isEqualTo("Anna Bērziņa");
+	}
+
+	private ResultActions anonymize(long id, long version) throws Exception {
+		return send(post(BASE + "/" + id + "/anonymize"), "{\"version\":%d}".formatted(version));
+	}
+
+	private void setUpdatedDaysAgo(long id, int days) {
+		this.jdbcClient.sql("UPDATE reservation SET updated_at = ? WHERE id = ?")
+			.params(java.sql.Timestamp.from(this.clock.instant().minus(Duration.ofDays(days))), id)
+			.update();
+	}
+
+	private String customerName(long id) {
+		return this.jdbcClient.sql("SELECT customer_name FROM reservation WHERE id = ?")
+			.param(id)
+			.query((row, number) -> row.getString(1))
+			.list()
+			.getFirst();
 	}
 
 	private long reserve(TestProducts.Created product, int quantity, String language) throws Exception {

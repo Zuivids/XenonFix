@@ -77,6 +77,11 @@ The panel is at `/admin`, in Latvian only, and is not indexed by search engines.
   it is reopened, which is refused if not enough is left. The customer gets an email when it is
   confirmed or cancelled, but not for corrections to a completed one. Notes are for admins only: they
   are never in public responses, emails or the audit log.
+- **Deleting customer data:** for a customer who asks, a cancelled or completed reservation's page has
+  "Dzēst klienta datus". It erases the name, phone, email, comment and notes, and keeps the number,
+  product, amounts, status and dates. An anonymized reservation can no longer be changed. Every night
+  at 03:30 the same happens to cancelled and completed reservations not changed for
+  `app.reservation.retention` (183 days, the policy's "6 months"). The privacy policy states this period: change both together.
 - **Audit log:** logins, password changes, and changes to admins, products and reservations, in `audit_log`.
   Never write passwords to it. Later features add their own event types.
 
@@ -120,4 +125,86 @@ missing from a language fails the build or a test. New pages are added to `PAGES
 New files in `frontend/public` appear only after restarting the dev server.
 
 For production, list the site's host names under `allowedHosts` in `frontend/angular.json`,
-or Angular refuses to render the request.
+or Angular refuses to render the request. `NG_ALLOWED_HOSTS` adds more without a rebuild.
+
+## Old addresses, sitemap and robots
+
+The frontend server (`frontend/src/server.ts`) answers these before Angular, so they work locally
+too:
+
+- **Old site addresses** (`src/server/old-addresses.ts`): a trailing `/` is dropped with a permanent
+  redirect, keeping the query (`/kontakti/` to `/kontakti`). Renamed pages redirect too, for example
+  `/shop/` to `/store` and `/piegades-nosacijumi-2/` to `/piegades-nosacijumi`. WordPress's own
+  addresses (`/wp-admin/…`, `/feed/`, `/?p=12`) answer 410 Gone, so search engines drop them.
+- **`/sitemap.xml`** lists every page and published product in all three languages, each with its
+  other languages, from `GET /api/store/sitemap`. If the backend does not answer it gives the last
+  list it had, or 503 so search engines try again.
+- **`/robots.txt`** is in `frontend/public`.
+
+**Old product addresses** keep working when a product's page address field is the old one. The old
+shop had these 13, all under `/product/`:
+
+```
+audi-a6-c7-4g-2015-2017-prieksejais-kreisais-lukturis
+audi-a6-c7-4g-2015-2018-prieksejais-kreisais-lukturis
+audi-a5-8t-2011-2016-prieksejais-labais-lukturis-copy
+audi-a6-c7-4g-2015-2018-prieksejais-labais-lukturis-2
+audi-a6-c7-4g-2015-2018-prieksejais-kreisais-lukturis-2
+bmw-e60-e61-2007-2010-labais-lukturis
+audi-a6-c7-4g-2011-2014-labais-lukturis-3
+audi-a6-c7-4g-2011-2014-labais-lukturis-2
+audi-a6-c7-4g-2011-2014-labais-lukturis
+vw-tiguan-2017-2019-labais-lukturis
+volvo-xc60-2009-2013-labais-lukturis
+volvo-xc60-2009-2013-kreisais-lukturis
+skoda-octavia-2020-aizmugurejais-lukturis
+```
+
+## Going live
+
+The server runs everything in Docker (`compose.prod.yaml`): MariaDB, the backend, the frontend
+server and Caddy, which gets the HTTPS certificates and is the only part reachable from outside.
+Caddy sends `/api` and `/uploads` to the backend and everything else to the frontend, and redirects
+`www` to the main address (`deploy/Caddyfile`).
+
+1. **A server:** any small Linux server (2 GB of memory is enough), with Docker and its Compose
+   plugin installed. Allow ports 80 and 443 in its firewall, and nothing else besides SSH.
+2. **The code:** `git clone https://github.com/Zuivids/XenonFix.git` and `cd XenonFix`.
+3. **Settings:** `cp deploy/.env.production.example .env`, then fill in `.env`: two new database
+   passwords, the first admin, and the mail server from the email provider. Never commit this file.
+4. **Try it before DNS:** `docker compose -f compose.prod.yaml up -d --build`. `docker compose -f
+   compose.prod.yaml ps` should show all four as running, three of them healthy. Caddy can only get
+   certificates once DNS points to the server, so until then its log shows certificate errors.
+5. **DNS:** point `xenonfix.lv` and `www.xenonfix.lv` (A records, and AAAA if the server has IPv6)
+   to the server. Within minutes of that Caddy has its certificates and the site answers at
+   https://xenonfix.lv. The old WordPress site stops being reachable at that moment.
+6. **First login** at https://xenonfix.lv/admin with the admin from `.env`, and change the password.
+   Then add the second admin, and remove `APP_ADMIN_PASSWORD` from `.env`.
+7. **Products:** enter them, with the old page addresses above where they apply.
+8. **Backups:** see below. Set them up on the first day.
+9. **Search engines:** in Google Search Console, submit `https://xenonfix.lv/sitemap.xml`.
+
+**Updating** after new commits: `git pull`, then `docker compose -f compose.prod.yaml up -d --build`.
+Database migrations run by themselves when the backend starts.
+
+**Logs:** `docker compose -f compose.prod.yaml logs backend` (or `frontend`, `caddy`), with `-f` to
+follow.
+
+**Visitor addresses:** the backend takes the visitor's address from `X-Forwarded-For`, which Caddy
+sets, but only from private network addresses (`application-prod.yml`). That is why the backend's
+port must never be published: rate limits, lockouts and the audit log depend on that address.
+
+### Backups
+
+`deploy/backup.sh` writes the database and the uploaded photos into one dated folder under
+`/var/backups/xenonfix`, and keeps the newest 14. Run it every night with cron (`crontab -e`):
+
+```
+15 3 * * * cd /root/XenonFix && deploy/backup.sh >> /var/log/xenonfix-backup.log 2>&1
+```
+
+A backup on the server's own disk is lost with the server, so also copy that folder somewhere else
+regularly, for example with `rsync` to another machine or the provider's backup service.
+
+`deploy/restore.sh <folder>` puts a backup back, after asking. Everything changed since that backup
+is lost, and the site is down for the minute it takes.

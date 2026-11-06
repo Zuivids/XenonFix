@@ -9,6 +9,7 @@ import lv.xenonfix.reservation.dto.ReservationDetailResponse;
 import lv.xenonfix.reservation.dto.ReservationNoteRequest;
 import lv.xenonfix.reservation.dto.ReservationPageResponse;
 import lv.xenonfix.reservation.dto.ReservationStatusRequest;
+import lv.xenonfix.reservation.dto.ReservationVersionRequest;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -51,6 +52,12 @@ class ReservationAdminController {
 	ReservationDetailResponse changeNote(@PathVariable long id, @Valid @RequestBody ReservationNoteRequest body,
 			@AuthenticationPrincipal AuthenticatedAdmin admin, HttpServletRequest request) {
 		return this.service.changeNote(id, body.note(), body.version(), actor(admin, request));
+	}
+
+	@PostMapping("/{id}/anonymize")
+	ReservationDetailResponse anonymize(@PathVariable long id, @Valid @RequestBody ReservationVersionRequest body,
+			@AuthenticationPrincipal AuthenticatedAdmin admin, HttpServletRequest request) {
+		return this.service.anonymize(id, body.version(), actor(admin, request));
 	}
 
 	private static Actor actor(AuthenticatedAdmin admin, HttpServletRequest request) {

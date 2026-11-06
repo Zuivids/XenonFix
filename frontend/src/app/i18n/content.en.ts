@@ -345,7 +345,7 @@ export const enContent: Content = {
     {
       heading: 'How long we keep the data',
       paragraphs: [
-        'We keep reservation data for [state the period, for example how long after the reservation is completed], unless the law requires longer, such as for accounting documents. We keep event log entries for [state the period].',
+        'We keep your contact details in a reservation for 6 months after it is completed or cancelled, and then erase them automatically. We keep the reservation number, product and amount for longer when the law requires it, such as for accounting documents. We keep event log entries for [state the period].',
       ],
     },
     {

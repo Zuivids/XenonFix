@@ -1,0 +1,33 @@
+# In front of the site on the server: HTTPS certificates (Let's Encrypt, renewed by Caddy itself),
+# www to the main address, and /api and /uploads to the backend. See README, "Going live".
+
+{$SITE_HOST:xenonfix.lv} {
+	encode zstd gzip
+
+	header {
+		# After the backend's or frontend's own headers, so these are the ones that count
+		defer
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "DENY"
+		-Server
+		-X-Powered-By
+	}
+
+	# Caddy sets X-Forwarded-For to the visitor's real address and drops any the visitor sent,
+	# which the backend relies on for its limits and the audit log
+	handle /api/* {
+		reverse_proxy backend:8090
+	}
+	handle /uploads/* {
+		reverse_proxy backend:8090
+	}
+	handle {
+		reverse_proxy frontend:4000
+	}
+}
+
+www.{$SITE_HOST:xenonfix.lv} {
+	redir https://{$SITE_HOST:xenonfix.lv}{uri} permanent
+}

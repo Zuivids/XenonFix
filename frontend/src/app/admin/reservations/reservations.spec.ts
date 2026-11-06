@@ -18,6 +18,7 @@ const SUMMARY: ReservationSummary = {
   customerPhone: '+371 20000000',
   status: 'PENDING',
   createdAt: '2026-11-05T10:00:00Z',
+  anonymized: false,
 };
 
 const RESERVATION: Reservation = {
@@ -38,7 +39,19 @@ const RESERVATION: Reservation = {
   status: 'PENDING',
   createdAt: '2026-11-05T10:00:00Z',
   updatedAt: '2026-11-05T10:00:00Z',
+  anonymizedAt: null,
   version: 4,
+};
+
+const ERASED: Reservation = {
+  ...RESERVATION,
+  status: 'COMPLETED',
+  customerName: null,
+  customerPhone: null,
+  customerEmail: null,
+  comment: null,
+  anonymizedAt: '2026-11-06T10:00:00Z',
+  version: 6,
 };
 
 describe('changeWarning', () => {
@@ -245,6 +258,54 @@ describe('Admin reservations', () => {
 
     expect(root.querySelector('textarea')?.value).toBe('Atnāks piektdien');
     expect(root.querySelector('[role="status"]')?.textContent).toBe('Saglabāts.');
+  });
+
+  it('marks anonymized reservations in the list', async () => {
+    const fixture = TestBed.createComponent(ReservationList);
+    fixture.detectChanges();
+    (await request('/api/admin/reservations')).flush({
+      items: [{ ...SUMMARY, customerName: null, customerPhone: null, status: 'COMPLETED', anonymized: true }],
+      page: 0,
+      totalPages: 1,
+    });
+    await settled(fixture);
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('tbody tr')?.textContent).toContain('Dati dzēsti');
+  });
+
+  it('offers erasing the customer only once the reservation is finished', async () => {
+    const pending = (await openDetail()).nativeElement as HTMLElement;
+    expect(pending.querySelector('.erase button')).toBeNull();
+    expect(pending.querySelector('.erase')?.textContent).toContain('atcelta vai pabeigta');
+  });
+
+  it('asks before erasing the customer, then shows the reservation without them', async () => {
+    const fixture = await openDetail({ ...RESERVATION, status: 'COMPLETED' });
+    const root = fixture.nativeElement as HTMLElement;
+
+    click(root, 'Dzēst klienta datus');
+
+    expect(confirm).toHaveBeenCalledWith(expect.stringContaining('nevar atsaukt'));
+    const sent = await request('/api/admin/reservations/7/anonymize');
+    expect(sent.request.body).toEqual({ version: 4 });
+    sent.flush(ERASED);
+    await settled(fixture);
+
+    expect(root.textContent).toContain('Klienta dati dzēsti 06.11.2026');
+    expect(root.textContent).not.toContain('Anna Bērziņa');
+    expect(root.querySelector('.status-actions')).toBeNull();
+    expect(root.querySelector('textarea')).toBeNull();
+    expect(root.querySelector('.erase')).toBeNull();
+  });
+
+  it('erases nothing when the admin says no', async () => {
+    confirm.mockReturnValue(false);
+    const fixture = await openDetail({ ...RESERVATION, status: 'CANCELLED' });
+
+    click(fixture.nativeElement, 'Dzēst klienta datus');
+    await settled(fixture);
+
+    http.expectNone('/api/admin/reservations/7/anonymize');
   });
 
   it('keeps the typed note and loads the news when someone else changed the reservation', async () => {

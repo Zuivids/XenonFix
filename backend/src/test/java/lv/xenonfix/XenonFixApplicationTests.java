@@ -39,7 +39,7 @@ class XenonFixApplicationTests {
 			.query(String.class)
 			.single();
 
-		assertThat(version).isEqualTo("5");
+		assertThat(version).isEqualTo("6");
 		assertThat(legalName).isEqualTo("SIA Elekanga");
 	}
 

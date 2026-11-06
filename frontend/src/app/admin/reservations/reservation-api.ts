@@ -10,10 +10,12 @@ export interface ReservationSummary {
   productName: string;
   quantity: number;
   total: number;
-  customerName: string;
-  customerPhone: string;
+  /** Empty once anonymized, like the other customer details. */
+  customerName: string | null;
+  customerPhone: string | null;
   status: ReservationStatus;
   createdAt: string;
+  anonymized: boolean;
 }
 
 export interface ReservationPage {
@@ -31,15 +33,17 @@ export interface Reservation {
   unitPrice: number;
   quantity: number;
   total: number;
-  customerName: string;
-  customerPhone: string;
-  customerEmail: string;
+  customerName: string | null;
+  customerPhone: string | null;
+  customerEmail: string | null;
   comment: string | null;
   adminNote: string | null;
   language: 'lv' | 'ru' | 'en';
   status: ReservationStatus;
   createdAt: string;
   updatedAt: string;
+  /** When the customer's details were erased; after that nothing can be changed. */
+  anonymizedAt: string | null;
   version: number;
 }
 
@@ -65,6 +69,10 @@ export class ReservationApi {
 
   changeNote(id: number, note: string, version: number): Observable<Reservation> {
     return this.http.put<Reservation>(`${BASE}/${id}/note`, { note, version });
+  }
+
+  anonymize(id: number, version: number): Observable<Reservation> {
+    return this.http.post<Reservation>(`${BASE}/${id}/anonymize`, { version });
   }
 }
 
