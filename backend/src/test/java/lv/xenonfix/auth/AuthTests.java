@@ -67,20 +67,33 @@ class AuthTests {
 	}
 
 	@Test
-	void loginGivesAccessAndChangesTheSessionId() throws Exception {
+	void thePasswordAloneGivesNoAccessAndChangesTheSessionId() throws Exception {
 		String email = this.testAdmins.create();
 		MockHttpSession session = new MockHttpSession();
 		String sessionIdBefore = session.getId();
 
 		this.testAdmins.attemptLogin(session, email, TestAdmins.PASSWORD)
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.status").value("AUTHENTICATED"))
+			.andExpect(jsonPath("$.status").value("MFA_SETUP_REQUIRED"))
 			.andExpect(jsonPath("$.admin.email").value(email));
 
 		assertThat(session.getId()).isNotEqualTo(sessionIdBefore);
 		this.mvc.perform(get("/api/admin/me").session(session))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.email").value(email));
+			.andExpect(jsonPath("$.step").value("MFA_SETUP_REQUIRED"));
+		this.mvc.perform(get("/api/admin/admins").session(session)).andExpect(status().isForbidden());
+	}
+
+	@Test
+	void bothStepsGiveAccess() throws Exception {
+		String email = this.testAdmins.create();
+
+		MockHttpSession session = this.testAdmins.login(email);
+
+		this.mvc.perform(get("/api/admin/me").session(session))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.email").value(email))
+			.andExpect(jsonPath("$.step").value("READY"));
 		this.mvc.perform(get("/api/admin/admins").session(session)).andExpect(status().isOk());
 	}
 
@@ -173,7 +186,8 @@ class AuthTests {
 
 		this.mvc.perform(get("/api/admin/me").session(session))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.passwordChangeRequired").value(true));
+			.andExpect(jsonPath("$.passwordChangeRequired").value(true))
+			.andExpect(jsonPath("$.step").value("PASSWORD_CHANGE_REQUIRED"));
 		this.mvc.perform(get("/api/admin/admins").session(session)).andExpect(status().isForbidden());
 
 		changePassword(session, TestAdmins.PASSWORD, "a brand new password").andExpect(status().isNoContent());
@@ -238,6 +252,10 @@ class AuthTests {
 			.andExpect(status().isUnauthorized());
 		this.testAdmins.attemptLogin(new MockHttpSession(), email, TestAdmins.PASSWORD).andExpect(status().isOk());
 		long id = this.testAdmins.id(email);
+		// The password alone is not a login
+		assertThat(count("LOGIN_SUCCEEDED", id)).isZero();
+
+		this.testAdmins.login(email);
 
 		assertThat(count("LOGIN_FAILED", id)).isEqualTo(1);
 		assertThat(count("LOGIN_SUCCEEDED", id)).isEqualTo(1);

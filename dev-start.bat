@@ -44,6 +44,16 @@ if errorlevel 1 (
   if errorlevel 1 (set "MSG=Could not update .env" & goto :fail)
 )
 
+rem A .env from before the two-step login: add the key that encrypts the authenticator keys
+findstr /b /c:"APP_MFA_KEY=" .env >nul 2>nul
+if errorlevel 1 (
+  echo Adding APP_MFA_KEY to .env...
+  powershell -NoProfile -Command ^
+    "$b = New-Object byte[] 32; [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b);" ^
+    "Add-Content -Encoding ascii .env @('', ('APP_MFA_KEY=' + [Convert]::ToBase64String($b)))"
+  if errorlevel 1 (set "MSG=Could not update .env" & goto :fail)
+)
+
 if not exist logs mkdir logs
 
 echo Starting database (container xenonfix-mariadb)...

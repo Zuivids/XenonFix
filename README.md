@@ -64,8 +64,9 @@ The panel is at `/admin`, in Latvian only, and is not indexed by search engines.
 - **More admins:** an admin adds them in the panel with a temporary password. The panel can also
   disable an admin and set a new temporary password for a forgotten one. Nobody can do either to
   their own account, so one active admin always remains.
-- **Protection:** Argon2id password hashes, session cookie with CSRF protection, 30 minutes idle
-  and 8 hours absolute session time, blocks after repeated failures, and a request limit per IP.
+- **Protection:** a two-step login (below), Argon2id password hashes, session cookie with CSRF
+  protection, 30 minutes idle and 8 hours absolute session time, blocks after repeated failures,
+  and a request limit per IP.
 - **Products:** name and description per language (only Latvian is required), part number, price,
   sale price, stock and photos. A product starts as a draft and needs a photo to be published.
   Products are archived rather than deleted, because reservations will refer to them.
@@ -85,9 +86,35 @@ The panel is at `/admin`, in Latvian only, and is not indexed by search engines.
 - **Audit log:** logins, password changes, and changes to admins, products and reservations, in `audit_log`.
   Never write passwords to it. Later features add their own event types.
 
-MFA is left out for now. To add it: create a table for the admins' secrets, make the login answer
-`MFA_REQUIRED` from `AuthService.login` (`LoginResponse.Status` is ready for it), and grant the
-admin authority only after the second step (`Authorities`).
+### Two-step login
+
+Every admin logs in with their password and then a 6-digit code from an authenticator app (Google
+Authenticator, Microsoft Authenticator or similar). There are no remembered devices.
+
+1. **Password** (`POST /api/admin/auth/login`). A right password alone gives no access and does not
+   reset the failure counts.
+2. **Code** (`POST /api/admin/auth/mfa`): from the app, or one of the admin's backup codes. An admin
+   without the app is sent to `/admin/mfa` instead. It shows a QR code and the key as text, and a code
+   from the app proves the setup. Then the admin gets 10 backup codes, shown once.
+3. **Temporary password:** changed only after the second step.
+
+How it is protected:
+- **Permissions:** each step gives the session only what that step needs (`Authorities`,
+  `SecurityConfig`). The second step must follow within 5 minutes, or the session ends.
+- **Wrong codes** count towards the same lockouts as wrong passwords, and a code works only once.
+- **Keys:** the authenticator keys are stored encrypted with `APP_MFA_KEY` (`MfaSecretCipher`, AES-GCM).
+  Backup codes are stored only as hashes.
+- **The key setting:** without `APP_MFA_KEY` the backend does not start. `dev-start` adds one to `.env`.
+  If the key is lost or changed, every admin must set up the app again: keep it with the backups.
+
+A lost phone:
+- **Backup code:** the admin logs in with one instead of a code from the app.
+- **Another admin:** on the admins page, "Atiestatīt divpakāpju pieslēgšanos". This erases the setup and
+  the backup codes, and ends the admin's sessions. They set up the app again at their next login.
+  Nobody can reset their own.
+- **New backup codes:** on the password page, with a current code from the app. The old ones stop working.
+- **If no admin can log in:** set `mfa_secret` to `NULL` for that admin in the database, and delete their
+  `admin_recovery_code` rows.
 
 ## Store and reservations
 
@@ -171,15 +198,17 @@ Caddy sends `/api` and `/uploads` to the backend and everything else to the fron
    plugin installed. Allow ports 80 and 443 in its firewall, and nothing else besides SSH.
 2. **The code:** `git clone https://github.com/Zuivids/XenonFix.git` and `cd XenonFix`.
 3. **Settings:** `cp deploy/.env.production.example .env`, then fill in `.env`: two new database
-   passwords, the first admin, and the mail server from the email provider. Never commit this file.
+   passwords, `APP_MFA_KEY` (`openssl rand -base64 32`), the first admin, and the mail server from the
+   email provider. Never commit this file. Keep a copy of `APP_MFA_KEY` with the backups, off the server.
 4. **Try it before DNS:** `docker compose -f compose.prod.yaml up -d --build`. `docker compose -f
    compose.prod.yaml ps` should show all four as running, three of them healthy. Caddy can only get
    certificates once DNS points to the server, so until then its log shows certificate errors.
 5. **DNS:** point `xenonfix.lv` and `www.xenonfix.lv` (A records, and AAAA if the server has IPv6)
    to the server. Within minutes of that Caddy has its certificates and the site answers at
    https://xenonfix.lv. The old WordPress site stops being reachable at that moment.
-6. **First login** at https://xenonfix.lv/admin with the admin from `.env`, and change the password.
-   Then add the second admin, and remove `APP_ADMIN_PASSWORD` from `.env`.
+6. **First login** at https://xenonfix.lv/admin with the admin from `.env`: set up the authenticator
+   app, keep the backup codes, and change the password. Then add the second admin, and remove
+   `APP_ADMIN_PASSWORD` from `.env`.
 7. **Products:** enter them, with the old page addresses above where they apply.
 8. **Backups:** see below. Set them up on the first day.
 9. **Search engines:** in Google Search Console, submit `https://xenonfix.lv/sitemap.xml`.
@@ -204,7 +233,9 @@ port must never be published: rate limits, lockouts and the audit log depend on 
 ```
 
 A backup on the server's own disk is lost with the server, so also copy that folder somewhere else
-regularly, for example with `rsync` to another machine or the provider's backup service.
+regularly, for example with `rsync` to another machine or the provider's backup service. The backup
+does not contain `.env`: keep `APP_MFA_KEY` and the database passwords safe separately, or a restored
+database needs every admin to set up the authenticator app again.
 
 `deploy/restore.sh <folder>` puts a backup back, after asking. Everything changed since that backup
 is lost, and the site is down for the minute it takes.

@@ -31,6 +31,17 @@ export class AdminSession {
     return me;
   }
 
+  async verifyMfa(code: string): Promise<Me> {
+    const me = await this.api.verifyMfa(code);
+    this.me.set(me);
+    return me;
+  }
+
+  /** After setting up the app: the session is now past the second step. */
+  setMe(me: Me): void {
+    this.me.set(me);
+  }
+
   async logout(): Promise<void> {
     await firstValueFrom(this.api.logout());
     this.me.set(null);

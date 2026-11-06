@@ -37,6 +37,17 @@ public class AdminUser {
 	@Column(name = "password_change_required", nullable = false)
 	private boolean passwordChangeRequired;
 
+	/** The authenticator key, encrypted (MfaSecretCipher); empty until the admin sets up the app. */
+	@Column(name = "mfa_secret", length = 128)
+	private byte[] mfaSecret;
+
+	@Column(name = "mfa_enabled_at")
+	private Instant mfaEnabledAt;
+
+	/** The time step of the last code used, so no code works twice. */
+	@Column(name = "mfa_last_step")
+	private Long mfaLastStep;
+
 	@Column(name = "failed_login_count", nullable = false)
 	private int failedLoginCount;
 
@@ -133,6 +144,44 @@ public class AdminUser {
 		this.status = AdminStatus.ACTIVE;
 		unlock();
 		this.updatedAt = now;
+	}
+
+	/** @param step the step of the code that proved the app works, which cannot be used again */
+	public void enableMfa(byte[] encryptedSecret, long step, Instant now) {
+		this.mfaSecret = encryptedSecret;
+		this.mfaEnabledAt = now;
+		this.mfaLastStep = step;
+		this.updatedAt = now;
+	}
+
+	/**
+	 * Accepts a code's time step if it is newer than the last one used.
+	 * @return {@code false} if that code, or a later one, was already used
+	 */
+	public boolean useMfaStep(long step, Instant now) {
+		if (this.mfaLastStep != null && step <= this.mfaLastStep) {
+			return false;
+		}
+		this.mfaLastStep = step;
+		this.updatedAt = now;
+		return true;
+	}
+
+	/** For a lost phone: the admin sets up the app again at next login, and open sessions end. */
+	public void resetMfa(Instant now) {
+		this.mfaSecret = null;
+		this.mfaEnabledAt = null;
+		this.mfaLastStep = null;
+		unlock();
+		endSessions(now);
+	}
+
+	public boolean isMfaEnabled() {
+		return this.mfaSecret != null;
+	}
+
+	public byte[] getMfaSecret() {
+		return this.mfaSecret;
 	}
 
 	private void unlock() {

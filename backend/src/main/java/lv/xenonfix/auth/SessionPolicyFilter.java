@@ -2,6 +2,7 @@ package lv.xenonfix.auth;
 
 import java.io.IOException;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -28,8 +29,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * the session's login is loaded:
  * <ul>
  * <li>the account was disabled since login;</li>
- * <li>the account's password changed or was reset (security version);</li>
- * <li>the session is older than the absolute timeout.</li>
+ * <li>the account's password changed or was reset, or its authenticator app was reset
+ * (security version);</li>
+ * <li>the session is older than the absolute timeout;</li>
+ * <li>the second step of the login was not done in time.</li>
  * </ul>
  * The request then continues as a logged-out request, so protected endpoints answer 401
  * and public ones still work.
@@ -42,6 +45,8 @@ public class SessionPolicyFilter extends OncePerRequestFilter {
 
 	private final AppProperties.Session sessionProperties;
 
+	private final Duration mfaPendingTimeout;
+
 	private final Clock clock;
 
 	private final SecurityContextHolderStrategy holderStrategy = SecurityContextHolder.getContextHolderStrategy();
@@ -50,6 +55,7 @@ public class SessionPolicyFilter extends OncePerRequestFilter {
 		this.admins = admins;
 		this.audit = audit;
 		this.sessionProperties = properties.session();
+		this.mfaPendingTimeout = properties.mfa().pendingTimeout();
 		this.clock = clock;
 	}
 
@@ -58,7 +64,7 @@ public class SessionPolicyFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		Authentication authentication = this.holderStrategy.getContext().getAuthentication();
 		if (authentication != null && authentication.getPrincipal() instanceof AuthenticatedAdmin admin) {
-			String reason = endReason(admin);
+			String reason = endReason(admin, authentication);
 			if (reason != null) {
 				end(request);
 				this.audit.record(AuditEventType.SESSION_ENDED, admin.id(), request.getRemoteAddr(), reason);
@@ -68,10 +74,14 @@ public class SessionPolicyFilter extends OncePerRequestFilter {
 	}
 
 	/** @return why the session must end, or {@code null} if it may continue */
-	private String endReason(AuthenticatedAdmin admin) {
-		Instant expiresAt = admin.authenticatedAt().plus(this.sessionProperties.absolute());
-		if (!this.clock.instant().isBefore(expiresAt)) {
+	private String endReason(AuthenticatedAdmin admin, Authentication authentication) {
+		Instant now = this.clock.instant();
+		if (!now.isBefore(admin.authenticatedAt().plus(this.sessionProperties.absolute()))) {
 			return "beidzies maksimālais sesijas laiks";
+		}
+		if (!Authorities.has(authentication.getAuthorities(), Authorities.MFA_DONE)
+				&& !now.isBefore(admin.authenticatedAt().plus(this.mfaPendingTimeout))) {
+			return "otrais solis netika pabeigts laikā";
 		}
 		// One primary-key lookup per request; keeps changes to an account effective immediately
 		Optional<AdminSessionState> state = this.admins.findSessionState(admin.id());
@@ -79,7 +89,8 @@ public class SessionPolicyFilter extends OncePerRequestFilter {
 			return "konts atslēgts";
 		}
 		if (state.get().securityVersion() != admin.securityVersion()) {
-			return "parole nomainīta";
+			// The password was changed or reset, or the authenticator app was reset
+			return "mainīta parole vai divpakāpju pieslēgšanās";
 		}
 		return null;
 	}

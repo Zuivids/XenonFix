@@ -60,4 +60,10 @@ class AdminManagementController {
 		return this.service.resetPassword(id, body.password(), actor, request.getRemoteAddr());
 	}
 
+	@PostMapping("/{id}/reset-mfa")
+	AdminResponse resetMfa(@PathVariable long id, @AuthenticationPrincipal AuthenticatedAdmin actor,
+			HttpServletRequest request) {
+		return this.service.resetMfa(id, actor, request.getRemoteAddr());
+	}
+
 }

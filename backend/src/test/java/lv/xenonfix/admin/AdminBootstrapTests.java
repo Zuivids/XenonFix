@@ -73,7 +73,7 @@ class AdminBootstrapTests {
 	@SuppressWarnings("deprecation")
 	private AdminBootstrap bootstrap(String email, String password) {
 		var bootstrapAdmin = new AppProperties.BootstrapAdmin(email, password, true);
-		var properties = new AppProperties(null, bootstrapAdmin, null, null, null, null, null);
+		var properties = new AppProperties(null, bootstrapAdmin, null, null, null, null, null, null);
 		return new AdminBootstrap(properties, this.admins, NoOpPasswordEncoder.getInstance(), mock(AuditService.class),
 				Clock.systemUTC());
 	}

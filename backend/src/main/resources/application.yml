@@ -66,6 +66,13 @@ app:
     # After this the customer's details are erased from cancelled and completed reservations,
     # every night. The privacy policy states the same period ("6 months"): change both together.
     retention: 183d
+  # Two-step login with an authenticator app. The key encrypts the admins' authenticator keys in
+  # the database; without it the application does not start. Keep it with the backups: if it is
+  # lost, every admin must set up the app again.
+  mfa:
+    key: ${APP_MFA_KEY:}
+    # After the password, the code must follow within this time
+    pending-timeout: 5m
   mail:
     from: ${APP_MAIL_FROM:info@xenonfix.lv}
     shop: ${APP_MAIL_SHOP:info@xenonfix.lv}

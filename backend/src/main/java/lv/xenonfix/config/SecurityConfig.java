@@ -38,6 +38,10 @@ class SecurityConfig {
 
 	private static final String RESERVATIONS_PATH = "/api/store/reservations";
 
+	private static final String MFA_PATH = "/api/admin/auth/mfa";
+
+	private static final String MFA_SETUP_PATH = "/api/admin/me/mfa/setup";
+
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http, SecurityContextRepository securityContextRepository,
 			AuditService audit, AdminUserRepository admins, AppProperties properties, Clock clock) throws Exception {
@@ -58,8 +62,12 @@ class SecurityConfig {
 				.requestMatchers(HttpMethod.POST, RESERVATIONS_PATH).permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/admin/auth/csrf").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/admin/auth/login").permitAll()
-				// Reachable before the password is changed; everything else needs the full role
-				.requestMatchers("/api/admin/me", "/api/admin/me/password").authenticated()
+				// Each step of the login reaches only what that step needs (Authorities)
+				.requestMatchers(HttpMethod.POST, MFA_PATH).hasAuthority(Authorities.MFA_PENDING)
+				.requestMatchers(MFA_SETUP_PATH).hasAuthority(Authorities.MFA_SETUP)
+				.requestMatchers(HttpMethod.GET, "/api/admin/me").authenticated()
+				.requestMatchers("/api/admin/me/password").hasAuthority(Authorities.MFA_DONE)
+				// Everything else needs both steps and the admin's own password
 				.requestMatchers("/api/admin/**").hasAuthority(Authorities.ADMIN)
 				// New public endpoints must be allowed above on purpose
 				.anyRequest().denyAll())
@@ -100,7 +108,9 @@ class SecurityConfig {
 	@Bean
 	FilterRegistrationBean<RateLimitFilter> authRateLimitFilter(RateLimiter rateLimiter, AppProperties properties) {
 		return rateLimit("authRateLimitFilter", new RateLimitFilter(rateLimiter, properties.rateLimit(),
-				Set.of("/api/admin/auth/login", "/api/admin/me/password"), "auth:"));
+				Set.of("/api/admin/auth/login", "/api/admin/me/password", MFA_PATH, MFA_SETUP_PATH,
+						"/api/admin/me/mfa/recovery-codes"),
+				"auth:"));
 	}
 
 	@Bean

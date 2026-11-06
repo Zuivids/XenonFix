@@ -23,6 +23,7 @@ const MIN_PASSWORD_LENGTH = 12;
             <th>Vārds</th>
             <th>E-pasts</th>
             <th>Statuss</th>
+            <th>Lietotne</th>
             <th>Pēdējā pieslēgšanās</th>
             <th>Darbības</th>
           </tr>
@@ -33,6 +34,7 @@ const MIN_PASSWORD_LENGTH = 12;
               <td>{{ admin.displayName }}</td>
               <td>{{ admin.email }}</td>
               <td>{{ statusText(admin) }}</td>
+              <td>{{ admin.mfaEnabled ? 'Iestatīta' : 'Vēl nav' }}</td>
               <td>{{ admin.lastLoginAt ? (admin.lastLoginAt | date: 'dd.MM.yyyy HH:mm') : '—' }}</td>
               <td>
                 @if (admin.id === session.me()?.id) {
@@ -40,6 +42,11 @@ const MIN_PASSWORD_LENGTH = 12;
                 } @else {
                   <div class="actions">
                     <button type="button" class="secondary" (click)="startReset(admin)">Jauna parole</button>
+                    @if (admin.mfaEnabled) {
+                      <button type="button" class="secondary" (click)="resetMfa(admin)">
+                        Atiestatīt divpakāpju pieslēgšanos
+                      </button>
+                    }
                     <button type="button" class="secondary" (click)="setEnabled(admin, admin.status !== 'ACTIVE')">
                       {{ admin.status === 'ACTIVE' ? 'Atslēgt' : 'Ieslēgt' }}
                     </button>
@@ -124,6 +131,21 @@ export class AdminList implements OnInit {
   protected setEnabled(admin: Admin, enabled: boolean): Promise<void> {
     return this.run(async () => {
       await firstValueFrom(this.api.setEnabled(admin.id, enabled));
+      await this.reload();
+    });
+  }
+
+  /** For a lost phone. The admin sets up the app again at their next login. */
+  protected resetMfa(admin: Admin): Promise<void> {
+    const question =
+      `Atiestatīt ${admin.email} divpakāpju pieslēgšanos? ` +
+      'Lietotnes iestatījums un rezerves kodi tiks dzēsti, administrators tiks izrakstīts un, ' +
+      'nākamreiz pieslēdzoties, iestatīs lietotni no jauna.';
+    if (!window.confirm(question)) {
+      return Promise.resolve();
+    }
+    return this.run(async () => {
+      await firstValueFrom(this.api.resetMfa(admin.id));
       await this.reload();
     });
   }

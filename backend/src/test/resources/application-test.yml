@@ -5,3 +5,6 @@ spring:
 
 app:
   uploads-path: ${java.io.tmpdir}/xenonfix-test-uploads
+  mfa:
+    # For the tests only: 32 bytes of zeros
+    key: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=

@@ -39,6 +39,9 @@ class AdminManagementTests {
 	@Autowired
 	private MutableClock clock;
 
+	@Autowired
+	private AdminRecoveryCodeRepository recoveryCodes;
+
 	private TestAdmins testAdmins;
 
 	@BeforeEach
@@ -120,6 +123,34 @@ class AdminManagementTests {
 
 		this.mvc.perform(get("/api/admin/me").session(otherSession)).andExpect(status().isUnauthorized());
 		this.testAdmins.attemptLogin(new MockHttpSession(), email, TEMPORARY_PASSWORD).andExpect(status().isOk());
+	}
+
+	@Test
+	void resettingTheAppSetupEndsSessionsAndAsksForANewSetup() throws Exception {
+		MockHttpSession session = this.testAdmins.loggedIn();
+		String email = this.testAdmins.create();
+		MockHttpSession otherSession = this.testAdmins.login(email);
+		long id = this.testAdmins.id(email);
+		this.mvc.perform(get("/api/admin/admins").session(session))
+			.andExpect(jsonPath("$[?(@.id == " + id + ")].mfaEnabled").value(true));
+
+		action(session, id, "reset-mfa").andExpect(status().isOk()).andExpect(jsonPath("$.mfaEnabled").value(false));
+
+		this.mvc.perform(get("/api/admin/me").session(otherSession)).andExpect(status().isUnauthorized());
+		this.testAdmins.attemptLogin(new MockHttpSession(), email, TestAdmins.PASSWORD)
+			.andExpect(jsonPath("$.status").value("MFA_SETUP_REQUIRED"));
+		// A new key, and the old one no longer works
+		this.testAdmins.login(email);
+		assertThat(this.recoveryCodes.countByAdminIdAndUsedAtIsNull(id)).isEqualTo(10);
+	}
+
+	@Test
+	void nobodyCanResetTheirOwnAppSetup() throws Exception {
+		String email = this.testAdmins.create();
+		MockHttpSession session = this.testAdmins.login(email);
+
+		action(session, this.testAdmins.id(email), "reset-mfa").andExpect(status().isConflict())
+			.andExpect(jsonPath("$.code").value("CANNOT_CHANGE_SELF"));
 	}
 
 	@Test

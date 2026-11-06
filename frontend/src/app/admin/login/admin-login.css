@@ -29,6 +29,24 @@ main {
   outline-offset: 4px;
 }
 
+.links {
+  display: grid;
+  justify-items: start;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+button.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #1e42eb;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
 img {
   display: block;
   width: auto;

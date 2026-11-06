@@ -5,12 +5,19 @@ import { provideRouter, Router, TitleStrategy } from '@angular/router';
 import { App } from '../app';
 import { routes } from '../app.routes';
 import { of } from 'rxjs';
+import { vi } from 'vitest';
 import { SeoTitleStrategy } from '../seo/seo-title-strategy';
 import { StoreApi } from '../store/store-api';
 import { Me } from './admin-api';
 import { sessionExpiredInterceptor } from './session-expired.interceptor';
 
-const ME: Me = { id: 1, email: 'admin@example.com', displayName: 'Admins', passwordChangeRequired: false };
+const ME: Me = {
+  id: 1,
+  email: 'admin@example.com',
+  displayName: 'Admins',
+  passwordChangeRequired: false,
+  step: 'READY',
+};
 
 describe('Admin panel', () => {
   let http: HttpTestingController;
@@ -61,7 +68,29 @@ describe('Admin panel', () => {
     }
     await navigation;
     await settled(fixture);
+    if (!me) {
+      await loginPageAsksWhoIsLoggedIn(fixture);
+    }
     return fixture;
+  }
+
+  /** The login page checks whether a code is still awaited; nobody is logged in here. */
+  async function loginPageAsksWhoIsLoggedIn(fixture: ComponentFixture<App>): Promise<void> {
+    (await request('/api/admin/me')).flush({}, { status: 401, statusText: 'Unauthorized' });
+    await settled(fixture);
+  }
+
+  async function submitPassword(fixture: ComponentFixture<App>): Promise<TestRequest> {
+    const root = fixture.nativeElement as HTMLElement;
+    type(root, 'email', ME.email);
+    type(root, 'password', 'correct horse battery');
+    root.querySelector('form')?.dispatchEvent(new Event('submit'));
+    (await request('/api/admin/auth/csrf')).flush(null);
+    return request('/api/admin/auth/login');
+  }
+
+  function click(root: HTMLElement, text: string): void {
+    [...root.querySelectorAll('button')].find((button) => button.textContent?.trim() === text)!.click();
   }
 
   function type(root: HTMLElement, name: string, value: string): void {
@@ -77,7 +106,7 @@ describe('Admin panel', () => {
   });
 
   it('sends an admin with a temporary password to change it', async () => {
-    const me = { ...ME, passwordChangeRequired: true };
+    const me: Me = { ...ME, passwordChangeRequired: true, step: 'PASSWORD_CHANGE_REQUIRED' };
     const fixture = TestBed.createComponent(App);
     const navigation = router.navigateByUrl('/admin/admins');
     (await request('/api/admin/me')).flush(me);
@@ -92,17 +121,24 @@ describe('Admin panel', () => {
     expect(root.querySelector('nav')?.textContent).not.toContain('Administratori');
   });
 
-  it('logs in and opens the panel', async () => {
+  it('logs in with the password and the code, and opens the panel', async () => {
     const fixture = await open('/admin', null);
     const root = fixture.nativeElement as HTMLElement;
-    type(root, 'email', ME.email);
-    type(root, 'password', 'correct horse battery');
 
-    root.querySelector('form')?.dispatchEvent(new Event('submit'));
-    (await request('/api/admin/auth/csrf')).flush(null);
-    const login = await request('/api/admin/auth/login');
+    const login = await submitPassword(fixture);
     expect(login.request.body).toEqual({ email: ME.email, password: 'correct horse battery' });
-    login.flush({ status: 'AUTHENTICATED', admin: ME });
+    login.flush({ status: 'MFA_REQUIRED', admin: { ...ME, step: 'MFA_REQUIRED' } });
+    await settled(fixture);
+
+    expect(router.url).toBe('/admin/login');
+    expect(root.querySelector('h1')?.textContent).toBe('Apstipriniet pieslēgšanos');
+    const codeInput = root.querySelector<HTMLInputElement>('input[formControlName="code"]')!;
+    expect(codeInput.getAttribute('autocomplete')).toBe('one-time-code');
+    type(root, 'code', ' 123456 ');
+    root.querySelector('form')?.dispatchEvent(new Event('submit'));
+    const code = await request('/api/admin/auth/mfa');
+    expect(code.request.body).toEqual({ code: '123456' });
+    code.flush({ status: 'AUTHENTICATED', admin: ME });
     (await request('/api/admin/me')).flush(ME);
     (await request('/api/admin/products')).flush({ items: [], page: 0, totalPages: 0 });
     await settled(fixture);
@@ -111,10 +147,164 @@ describe('Admin panel', () => {
     expect(root.querySelector('h1')?.textContent).toBe('Produkti');
   });
 
+  it('explains a wrong code and lets the admin try a backup code', async () => {
+    const fixture = await open('/admin', null);
+    const root = fixture.nativeElement as HTMLElement;
+    (await submitPassword(fixture)).flush({ status: 'MFA_REQUIRED', admin: { ...ME, step: 'MFA_REQUIRED' } });
+    await settled(fixture);
+
+    type(root, 'code', '000000');
+    root.querySelector('form')?.dispatchEvent(new Event('submit'));
+    (await request('/api/admin/auth/mfa')).flush({ code: 'INVALID_CODE' }, { status: 400, statusText: 'Bad Request' });
+    await settled(fixture);
+
+    expect(root.querySelector('[role="alert"]')?.textContent).toContain('Kods nav pareizs');
+    expect(root.querySelector<HTMLInputElement>('input[formControlName="code"]')?.value).toBe('');
+    expect(router.url).toBe('/admin/login');
+
+    click(root, 'Nav tālruņa? Izmantot rezerves kodu');
+    await settled(fixture);
+    expect(root.querySelector('label')?.textContent).toContain('Rezerves kods');
+    type(root, 'code', 'K7QF2-M9XPD');
+    root.querySelector('form')?.dispatchEvent(new Event('submit'));
+    expect((await request('/api/admin/auth/mfa')).request.body).toEqual({ code: 'K7QF2-M9XPD' });
+  });
+
+  it('goes back to the password when the code step has run out of time', async () => {
+    const fixture = await open('/admin', null);
+    const root = fixture.nativeElement as HTMLElement;
+    (await submitPassword(fixture)).flush({ status: 'MFA_REQUIRED', admin: { ...ME, step: 'MFA_REQUIRED' } });
+    await settled(fixture);
+
+    type(root, 'code', '123456');
+    root.querySelector('form')?.dispatchEvent(new Event('submit'));
+    (await request('/api/admin/auth/mfa')).flush({}, { status: 401, statusText: 'Unauthorized' });
+    await settled(fixture);
+
+    expect(root.querySelector('h1')?.textContent).toBe('Pieslēgšanās');
+    expect(root.querySelector('[role="alert"]')?.textContent).toContain('laiks beidzās');
+  });
+
+  it('sets up the app, shows the backup codes once and then opens the panel', async () => {
+    const setupMe: Me = { ...ME, step: 'MFA_SETUP_REQUIRED' };
+    const fixture = await open('/admin', null);
+    const root = fixture.nativeElement as HTMLElement;
+    (await submitPassword(fixture)).flush({ status: 'MFA_SETUP_REQUIRED', admin: setupMe });
+    (await request('/api/admin/me')).flush(setupMe);
+    (await request('/api/admin/me')).flush(setupMe);
+    (await request('/api/admin/me/mfa/setup')).flush({ qrCode: 'data:image/png;base64,iVBORw0KGgo=', secret: 'ABCD EFGH' });
+    await settled(fixture);
+
+    expect(router.url).toBe('/admin/mfa');
+    expect(root.querySelector('img.qr')?.getAttribute('src')).toBe('data:image/png;base64,iVBORw0KGgo=');
+    expect(root.querySelector('.secret')?.textContent).toBe('ABCD EFGH');
+    expect(root.querySelector('nav')?.textContent?.trim()).toBe('');
+
+    type(root, 'code', '654321');
+    root.querySelector('form')?.dispatchEvent(new Event('submit'));
+    const done = await request('/api/admin/me/mfa/setup');
+    expect(done.request.method).toBe('POST');
+    expect(done.request.body).toEqual({ code: '654321' });
+    const codes = Array.from({ length: 10 }, (_, i) => `AAAAA-BBBB${i}`);
+    done.flush({ codes, admin: ME });
+    await settled(fixture);
+
+    expect([...root.querySelectorAll('.codes code')].map((code) => code.textContent)).toEqual(codes);
+    const next = [...root.querySelectorAll('button')].find((button) => button.textContent?.trim() === 'Turpināt')!;
+    expect(next.disabled).toBe(true);
+    root.querySelector<HTMLInputElement>('.check input')!.click();
+    await settled(fixture);
+    next.click();
+    (await request('/api/admin/products')).flush({ items: [], page: 0, totalPages: 0 });
+    await settled(fixture);
+
+    expect(router.url).toBe('/admin/products');
+    expect(root.querySelector('nav')?.textContent).toContain('Rezervācijas');
+  });
+
+  it('after setting up the app, a temporary password is changed next', async () => {
+    const setupMe: Me = { ...ME, passwordChangeRequired: true, step: 'MFA_SETUP_REQUIRED' };
+    const fixture = await open('/admin', null);
+    const root = fixture.nativeElement as HTMLElement;
+    (await submitPassword(fixture)).flush({ status: 'MFA_SETUP_REQUIRED', admin: setupMe });
+    (await request('/api/admin/me')).flush(setupMe);
+    (await request('/api/admin/me')).flush(setupMe);
+    (await request('/api/admin/me/mfa/setup')).flush({ qrCode: 'data:image/png;base64,iVBORw0KGgo=', secret: 'ABCD' });
+    await settled(fixture);
+    type(root, 'code', '654321');
+    root.querySelector('form')?.dispatchEvent(new Event('submit'));
+    (await request('/api/admin/me/mfa/setup')).flush({
+      codes: ['AAAAA-BBBBB'],
+      admin: { ...setupMe, step: 'PASSWORD_CHANGE_REQUIRED' },
+    });
+    await settled(fixture);
+
+    root.querySelector<HTMLInputElement>('.check input')!.click();
+    await settled(fixture);
+    click(root, 'Turpināt');
+    await settled(fixture);
+
+    expect(router.url).toBe('/admin/password');
+    expect(root.querySelector('[role="status"]')?.textContent).toContain('pagaidu parole');
+  });
+
+  it('lets an admin reset another admin\'s app setup after asking', async () => {
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const fixture = await open('/admin/admins', ME);
+    const root = fixture.nativeElement as HTMLElement;
+    const other = {
+      id: 2,
+      email: 'other@example.com',
+      displayName: 'Cits',
+      status: 'ACTIVE',
+      locked: false,
+      passwordChangeRequired: false,
+      mfaEnabled: true,
+      lastLoginAt: null,
+      createdAt: '2026-11-01T10:00:00Z',
+    };
+    (await request('/api/admin/admins')).flush([{ ...other, id: 1, email: ME.email }, other]);
+    await settled(fixture);
+    expect(root.querySelector('tbody')?.textContent).toContain('Iestatīta');
+
+    click(root, 'Atiestatīt divpakāpju pieslēgšanos');
+
+    expect(confirm).toHaveBeenCalledWith(expect.stringContaining('other@example.com'));
+    const reset = await request('/api/admin/admins/2/reset-mfa');
+    expect(reset.request.method).toBe('POST');
+    reset.flush({ ...other, mfaEnabled: false });
+    (await request('/api/admin/admins')).flush([{ ...other, mfaEnabled: false }]);
+    await settled(fixture);
+    expect(root.querySelector('tbody')?.textContent).toContain('Vēl nav');
+    confirm.mockRestore();
+  });
+
+  it('makes new backup codes with a code from the app', async () => {
+    const fixture = await open('/admin/password', ME);
+    const root = fixture.nativeElement as HTMLElement;
+    (await request('/api/admin/me/mfa/recovery-codes')).flush({ left: 3 });
+    await settled(fixture);
+    expect(root.querySelector('.recovery')?.textContent).toContain('Neizmantoti: 3 no 10');
+
+    type(root, 'code', '112233');
+    root.querySelectorAll('form')[1].dispatchEvent(new Event('submit'));
+    const renew = await request('/api/admin/me/mfa/recovery-codes');
+    expect(renew.request.method).toBe('POST');
+    expect(renew.request.body).toEqual({ code: '112233' });
+    renew.flush({ codes: ['CCCCC-DDDDD', 'EEEEE-FFFFF'], admin: ME });
+    await settled(fixture);
+
+    expect([...root.querySelectorAll('.codes code')].map((code) => code.textContent)).toEqual([
+      'CCCCC-DDDDD',
+      'EEEEE-FFFFF',
+    ]);
+  });
+
   it('shows a clear message when the login fails, and clears the password', async () => {
     const fixture = TestBed.createComponent(App);
     await router.navigateByUrl('/admin/login');
     await settled(fixture);
+    await loginPageAsksWhoIsLoggedIn(fixture);
     const root = fixture.nativeElement as HTMLElement;
     type(root, 'email', ME.email);
     type(root, 'password', 'wrong password');

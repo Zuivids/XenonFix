@@ -52,6 +52,12 @@
 			<groupId>com.github.ben-manes.caffeine</groupId>
 			<artifactId>caffeine</artifactId>
 		</dependency>
+		<!-- QR codes for setting up an authenticator app -->
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>3.5.3</version>
+		</dependency>
 		<!-- Reads the rotation that phones store in photos, so uploads are not sideways -->
 		<dependency>
 			<groupId>com.drewnoakes</groupId>

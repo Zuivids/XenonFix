@@ -42,6 +42,12 @@ if ! grep -q '^APP_ADMIN_PASSWORD=' .env; then
   printf '\nAPP_ADMIN_EMAIL=admin@xenonfix.test\nAPP_ADMIN_PASSWORD=%s\n' "$(random)" >> .env
 fi
 
+# A .env from before the two-step login: add the key that encrypts the authenticator keys
+if ! grep -q '^APP_MFA_KEY=' .env; then
+  echo "Adding APP_MFA_KEY to .env..."
+  printf '\nAPP_MFA_KEY=%s\n' "$(head -c 32 /dev/urandom | base64)" >> .env
+fi
+
 mkdir -p logs
 
 echo "Starting database (container xenonfix-mariadb)..."

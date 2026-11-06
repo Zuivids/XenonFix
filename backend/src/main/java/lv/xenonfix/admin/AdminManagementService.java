@@ -24,6 +24,8 @@ class AdminManagementService {
 
 	private final AdminUserRepository admins;
 
+	private final AdminRecoveryCodeRepository recoveryCodes;
+
 	private final PasswordEncoder passwordEncoder;
 
 	private final LoginAttemptTracker attempts;
@@ -32,9 +34,10 @@ class AdminManagementService {
 
 	private final Clock clock;
 
-	AdminManagementService(AdminUserRepository admins, PasswordEncoder passwordEncoder, LoginAttemptTracker attempts,
-			AuditService audit, Clock clock) {
+	AdminManagementService(AdminUserRepository admins, AdminRecoveryCodeRepository recoveryCodes,
+			PasswordEncoder passwordEncoder, LoginAttemptTracker attempts, AuditService audit, Clock clock) {
 		this.admins = admins;
+		this.recoveryCodes = recoveryCodes;
 		this.passwordEncoder = passwordEncoder;
 		this.attempts = attempts;
 		this.audit = audit;
@@ -92,6 +95,21 @@ class AdminManagementService {
 		return toResponse(admin, now);
 	}
 
+	/**
+	 * For a lost phone: erases the admin's app setup and backup codes and ends their sessions,
+	 * so they set up the app again at their next login.
+	 */
+	@Transactional
+	AdminResponse resetMfa(long id, AuthenticatedAdmin actor, String ipAddress) {
+		AdminUser admin = findOther(id, actor);
+		Instant now = this.clock.instant();
+		admin.resetMfa(now);
+		this.recoveryCodes.deleteAllOf(admin.getId());
+		this.attempts.resetAll(admin.getId());
+		recordAction(AuditEventType.ADMIN_MFA_RESET, actor, admin, ipAddress);
+		return toResponse(admin, now);
+	}
+
 	private AdminUser findOther(long id, AuthenticatedAdmin actor) {
 		if (id == actor.id()) {
 			throw new ApiException(HttpStatus.CONFLICT, "CANNOT_CHANGE_SELF");
@@ -106,7 +124,8 @@ class AdminManagementService {
 
 	private static AdminResponse toResponse(AdminUser admin, Instant now) {
 		return new AdminResponse(admin.getId(), admin.getEmail(), admin.getDisplayName(), admin.getStatus(),
-				admin.isLocked(now), admin.isPasswordChangeRequired(), admin.getLastLoginAt(), admin.getCreatedAt());
+				admin.isLocked(now), admin.isPasswordChangeRequired(), admin.isMfaEnabled(), admin.getLastLoginAt(),
+				admin.getCreatedAt());
 	}
 
 }

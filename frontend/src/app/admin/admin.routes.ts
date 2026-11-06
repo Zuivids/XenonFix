@@ -49,6 +49,11 @@ export const adminRoutes: Routes = [
         loadComponent: () => import('./audit/audit-log').then((m) => m.AuditLog),
       },
       {
+        path: 'mfa',
+        title: 'Divpakāpju pieslēgšanās - XenonFix',
+        loadComponent: () => import('./mfa/mfa-setup').then((m) => m.MfaSetupPage),
+      },
+      {
         path: 'password',
         title: 'Mainīt paroli - XenonFix',
         loadComponent: () => import('./password/change-password').then((m) => m.ChangePassword),

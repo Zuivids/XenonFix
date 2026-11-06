@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 
 // These answer 401 as part of normal use, and their callers handle it
-const HANDLED_BY_CALLER = ['/api/admin/auth/login', '/api/admin/me'];
+const HANDLED_BY_CALLER = ['/api/admin/auth/login', '/api/admin/auth/mfa', '/api/admin/me'];
 
 /** Back to the login page when the session has ended while the panel is open. */
 export const sessionExpiredInterceptor: HttpInterceptorFn = (request, next) => {

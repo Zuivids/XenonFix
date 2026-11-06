@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties("app")
 public record AppProperties(Path uploadsPath, BootstrapAdmin bootstrapAdmin, Lockout lockout, RateLimit rateLimit,
-		Session session, Reservation reservation, Mail mail) {
+		Session session, Reservation reservation, Mail mail, Mfa mfa) {
 
 	/**
 	 * @param email email of the first admin; empty means no admin is created
@@ -38,6 +38,13 @@ public record AppProperties(Path uploadsPath, BootstrapAdmin bootstrapAdmin, Loc
 	 * @param shop where the shop's copies go
 	 */
 	public record Mail(String from, String shop) {
+	}
+
+	/**
+	 * @param key encrypts the authenticator keys in the database: 32 random bytes in Base64
+	 * @param pendingTimeout how long a session may wait at the second step of the login
+	 */
+	public record Mfa(String key, Duration pendingTimeout) {
 	}
 
 }

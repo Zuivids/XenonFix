@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AdminSession } from '../admin-session';
 
@@ -21,29 +21,33 @@ import { AdminSession } from '../admin-session';
             aria-label="Administrēšana"
             (click)="menuOpen.set(false)"
           >
-            @if (!passwordChangeRequired()) {
+            @if (me.step === 'READY') {
               <a routerLink="/admin/reservations" routerLinkActive="active">Rezervācijas</a>
               <a routerLink="/admin/products" routerLinkActive="active">Produkti</a>
               <a routerLink="/admin/admins" routerLinkActive="active">Administratori</a>
               <a routerLink="/admin/audit" routerLinkActive="active">Notikumu žurnāls</a>
             }
-            <a routerLink="/admin/password" routerLinkActive="active">Mainīt paroli</a>
+            @if (me.step === 'READY' || me.step === 'PASSWORD_CHANGE_REQUIRED') {
+              <a routerLink="/admin/password" routerLinkActive="active">Mainīt paroli</a>
+            }
           </nav>
           <div class="account">
             <span class="name">{{ me.displayName }}</span>
             <button type="button" class="logout" (click)="logout()">Iziet</button>
-            <button
-              type="button"
-              class="menu-toggle"
-              [class.open]="menuOpen()"
-              aria-label="Izvēlne"
-              [attr.aria-expanded]="menuOpen()"
-              aria-controls="admin-nav"
-              (click)="menuOpen.set(!menuOpen())"
-            >
-              <span></span>
-              <span></span>
-            </button>
+            @if (me.step === 'READY' || me.step === 'PASSWORD_CHANGE_REQUIRED') {
+              <button
+                type="button"
+                class="menu-toggle"
+                [class.open]="menuOpen()"
+                aria-label="Izvēlne"
+                [attr.aria-expanded]="menuOpen()"
+                aria-controls="admin-nav"
+                (click)="menuOpen.set(!menuOpen())"
+              >
+                <span></span>
+                <span></span>
+              </button>
+            }
           </div>
         }
       </div>
@@ -59,9 +63,6 @@ export class AdminLayout {
   private readonly router = inject(Router);
 
   protected readonly menuOpen = signal(false);
-  protected readonly passwordChangeRequired = computed(
-    () => this.session.me()?.passwordChangeRequired ?? false,
-  );
 
   protected async logout(): Promise<void> {
     try {
