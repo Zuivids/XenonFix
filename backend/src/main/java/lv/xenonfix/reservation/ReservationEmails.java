@@ -8,6 +8,8 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
 import lv.xenonfix.config.AppProperties;
+import lv.xenonfix.page.PageService;
+import lv.xenonfix.page.content.SiteInfoContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,9 +38,12 @@ class ReservationEmails {
 
 	private final AppProperties.Mail settings;
 
-	ReservationEmails(JavaMailSender mailSender, AppProperties properties) {
+	private final PageService pages;
+
+	ReservationEmails(JavaMailSender mailSender, AppProperties properties, PageService pages) {
 		this.mailSender = mailSender;
 		this.settings = properties.mail();
+		this.pages = pages;
 	}
 
 	@Async
@@ -54,7 +59,7 @@ class ReservationEmails {
 		send(change.reference(), "status", (message) -> {
 			message.setTo(change.customerEmail());
 			message.setSubject(StatusTexts.subject(change));
-			message.setText(StatusTexts.body(change), false);
+			message.setText(StatusTexts.body(change, shopDetails()), false);
 		});
 	}
 
@@ -62,8 +67,34 @@ class ReservationEmails {
 		send(reservation.reference(), "customer", (message) -> {
 			message.setTo(reservation.customerEmail());
 			message.setSubject(CustomerTexts.subject(reservation));
-			message.setText(CustomerTexts.body(reservation), false);
+			message.setText(CustomerTexts.body(reservation, shopDetails()), false);
 		});
+	}
+
+	/** As edited in the panel's contact details, read for each email so a change applies at once. */
+	private ShopDetails shopDetails() {
+		SiteInfoContent info = this.pages.siteInfo();
+		return new ShopDetails(info.street() + ", " + info.city(), info.phone(), info.email(), info.companyName());
+	}
+
+	/**
+	 * The shop's details in a template, before the customer's details go in, so nothing a
+	 * customer typed is ever taken for a placeholder.
+	 */
+	record ShopDetails(String address, String phone, String email, String company) {
+
+		String fill(String template) {
+			return template.replace("{address}", escape(this.address))
+				.replace("{phone}", escape(this.phone))
+				.replace("{email}", escape(this.email))
+				.replace("{company}", escape(this.company));
+		}
+
+		/** The template then goes through String.formatted, where % has a meaning. */
+		private static String escape(String value) {
+			return value.replace("%", "%%");
+		}
+
 	}
 
 	private void sendToShop(ReservationCreated reservation) {
@@ -136,11 +167,11 @@ class ReservationEmails {
 				Prece: %3$s
 				Daudzums: %4$d
 
-				Preci varat saņemt mūsu darbnīcā: Bauskas iela 16c, Rīga.
+				Preci varat saņemt mūsu darbnīcā: {address}.
 
-				Jautājumi? Zvaniet +371 288 03 119 vai rakstiet info@xenonfix.lv.
+				Jautājumi? Zvaniet {phone} vai rakstiet {email}.
 
-				XenonFix (SIA Elekanga)
+				XenonFix ({company})
 				""";
 
 		private static final String CONFIRMED_RU = """
@@ -151,11 +182,11 @@ class ReservationEmails {
 				Товар: %3$s
 				Количество: %4$d
 
-				Забрать товар можно в нашей мастерской: Bauskas iela 16c, Рига.
+				Забрать товар можно в нашей мастерской: {address}.
 
-				Вопросы? Звоните +371 288 03 119 или пишите info@xenonfix.lv.
+				Вопросы? Звоните {phone} или пишите {email}.
 
-				XenonFix (SIA Elekanga)
+				XenonFix ({company})
 				""";
 
 		private static final String CONFIRMED_EN = """
@@ -166,11 +197,11 @@ class ReservationEmails {
 				Product: %3$s
 				Quantity: %4$d
 
-				You can collect the product from our workshop: Bauskas iela 16c, Riga.
+				You can collect the product from our workshop: {address}.
 
-				Questions? Call +371 288 03 119 or write to info@xenonfix.lv.
+				Questions? Call {phone} or write to {email}.
 
-				XenonFix (SIA Elekanga)
+				XenonFix ({company})
 				""";
 
 		private static final String CANCELLED_LV = """
@@ -181,9 +212,9 @@ class ReservationEmails {
 				Prece: %3$s
 				Daudzums: %4$d
 
-				Ja Jums ir jautājumi, zvaniet +371 288 03 119 vai rakstiet info@xenonfix.lv.
+				Ja Jums ir jautājumi, zvaniet {phone} vai rakstiet {email}.
 
-				XenonFix (SIA Elekanga)
+				XenonFix ({company})
 				""";
 
 		private static final String CANCELLED_RU = """
@@ -194,9 +225,9 @@ class ReservationEmails {
 				Товар: %3$s
 				Количество: %4$d
 
-				Если у вас есть вопросы, звоните +371 288 03 119 или пишите info@xenonfix.lv.
+				Если у вас есть вопросы, звоните {phone} или пишите {email}.
 
-				XenonFix (SIA Elekanga)
+				XenonFix ({company})
 				""";
 
 		private static final String CANCELLED_EN = """
@@ -207,9 +238,9 @@ class ReservationEmails {
 				Product: %3$s
 				Quantity: %4$d
 
-				If you have any questions, call +371 288 03 119 or write to info@xenonfix.lv.
+				If you have any questions, call {phone} or write to {email}.
 
-				XenonFix (SIA Elekanga)
+				XenonFix ({company})
 				""";
 
 		private StatusTexts() {
@@ -224,14 +255,14 @@ class ReservationEmails {
 			};
 		}
 
-		static String body(ReservationStatusChanged change) {
+		static String body(ReservationStatusChanged change, ShopDetails shop) {
 			boolean confirmed = change.status() == ReservationStatus.CONFIRMED;
 			String template = switch (change.language()) {
 				case lv -> confirmed ? CONFIRMED_LV : CANCELLED_LV;
 				case ru -> confirmed ? CONFIRMED_RU : CANCELLED_RU;
 				case en -> confirmed ? CONFIRMED_EN : CANCELLED_EN;
 			};
-			return template.formatted(change.customerName(), change.reference(), change.productName(),
+			return shop.fill(template).formatted(change.customerName(), change.reference(), change.productName(),
 					change.quantity());
 		}
 
@@ -248,11 +279,11 @@ class ReservationEmails {
 				%4$sDaudzums: %5$d
 				Kopā: %6$s
 
-				Tagad nekas nav jāmaksā. Mēs ar Jums sazināsimies, lai apstiprinātu rezervāciju. Preci varēs saņemt mūsu darbnīcā: Bauskas iela 16c, Rīga.
+				Tagad nekas nav jāmaksā. Mēs ar Jums sazināsimies, lai apstiprinātu rezervāciju. Preci varēs saņemt mūsu darbnīcā: {address}.
 
-				Jautājumi? Zvaniet +371 288 03 119 vai rakstiet info@xenonfix.lv.
+				Jautājumi? Zvaniet {phone} vai rakstiet {email}.
 
-				XenonFix (SIA Elekanga)
+				XenonFix ({company})
 				""";
 
 		private static final String RU = """
@@ -264,11 +295,11 @@ class ReservationEmails {
 				%4$sКоличество: %5$d
 				Итого: %6$s
 
-				Сейчас платить ничего не нужно. Мы свяжемся с вами, чтобы подтвердить резервирование. Забрать товар можно будет в нашей мастерской: Bauskas iela 16c, Рига.
+				Сейчас платить ничего не нужно. Мы свяжемся с вами, чтобы подтвердить резервирование. Забрать товар можно будет в нашей мастерской: {address}.
 
-				Вопросы? Звоните +371 288 03 119 или пишите info@xenonfix.lv.
+				Вопросы? Звоните {phone} или пишите {email}.
 
-				XenonFix (SIA Elekanga)
+				XenonFix ({company})
 				""";
 
 		private static final String EN = """
@@ -280,11 +311,11 @@ class ReservationEmails {
 				%4$sQuantity: %5$d
 				Total: %6$s
 
-				There is nothing to pay now. We will contact you to confirm the reservation. You can collect the product from our workshop: Bauskas iela 16c, Riga.
+				There is nothing to pay now. We will contact you to confirm the reservation. You can collect the product from our workshop: {address}.
 
-				Questions? Call +371 288 03 119 or write to info@xenonfix.lv.
+				Questions? Call {phone} or write to {email}.
 
-				XenonFix (SIA Elekanga)
+				XenonFix ({company})
 				""";
 
 		private CustomerTexts() {
@@ -298,7 +329,7 @@ class ReservationEmails {
 			};
 		}
 
-		static String body(ReservationCreated reservation) {
+		static String body(ReservationCreated reservation, ShopDetails shop) {
 			String partNumberLabel = switch (reservation.language()) {
 				case lv -> "Detaļas numurs";
 				case ru -> "Номер детали";
@@ -309,7 +340,7 @@ class ReservationEmails {
 				case ru -> RU;
 				case en -> EN;
 			};
-			return template.formatted(reservation.customerName(), reservation.reference(), reservation.productName(),
+			return shop.fill(template).formatted(reservation.customerName(), reservation.reference(), reservation.productName(),
 					line(partNumberLabel, reservation.partNumber()), reservation.quantity(), money(reservation.total()));
 		}
 

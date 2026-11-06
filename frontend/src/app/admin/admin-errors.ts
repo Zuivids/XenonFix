@@ -26,6 +26,8 @@ const MESSAGES: Record<string, string> = {
   INVALID_IMAGE: 'Šis fails nav derīgs JPEG vai PNG attēls.',
   IMAGE_TOO_LARGE: 'Attēls ir pārāk liels. Maksimums ir 60 megapikseļi.',
   PRODUCT_NOT_FOUND: 'Produkts nav atrasts.',
+  PAGE_NOT_FOUND: 'Lapa nav atrasta.',
+  INVALID_PAGE_CONTENT: 'Lapa nav saglabāta: kāds lauks nav pareizi aizpildīts.',
   IMAGE_NOT_FOUND: 'Foto nav atrasts.',
 };
 

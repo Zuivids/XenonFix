@@ -1,50 +1,55 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { I18n } from '../i18n/i18n';
-import { SITE_INFO } from '../site-info';
+import { ContactPage } from '../pages/page-api';
+import { PageUnavailable } from '../pages/page-unavailable';
+import { SiteInfo } from '../pages/site-info';
 
 /** Map links rather than an embedded map, which would set third-party cookies. */
 @Component({
   selector: 'app-contact',
+  imports: [PageUnavailable],
   template: `
-    <header class="page-head">
-      <div class="container">
-        <p class="eyebrow">XenonFix</p>
-        <h1>{{ t('contact.heading') }}</h1>
-      </div>
-    </header>
+    @if (page(); as p) {
+      <header class="page-head">
+        <div class="container">
+          <p class="eyebrow">XenonFix</p>
+          <h1>{{ p.heading }}</h1>
+        </div>
+      </header>
 
-    <div class="container page-body">
-      <div class="cards">
-        <section class="lift reveal">
-          <h2>{{ t('contact.phone') }}</h2>
-          <p class="big"><a [href]="info.phoneHref">{{ info.phone }}</a></p>
-          <a class="button" [href]="info.whatsappHref" rel="noopener">{{ t('cta.whatsapp') }}</a>
-        </section>
-        <section class="lift reveal">
-          <h2>{{ t('contact.address') }}</h2>
-          <p class="big">{{ info.street }}<br />{{ info.city }}</p>
-          <div class="button-row">
-            <a class="button secondary" [href]="info.googleMapsHref" rel="noopener">{{ t('contact.map') }}</a>
-            <a class="button secondary" [href]="info.wazeHref" rel="noopener">{{ t('contact.navigate') }}</a>
-          </div>
-        </section>
-        <section class="lift reveal">
-          <h2>{{ t('contact.email') }}</h2>
-          <p class="big"><a [href]="'mailto:' + info.email">{{ info.email }}</a></p>
-        </section>
-        <section class="lift reveal">
-          <h2>{{ t('contact.hours') }}</h2>
-          <dl>
-            <dt>{{ t('contact.weekdays') }}</dt>
-            <dd>9:00–17:00</dd>
-            <dt>{{ t('contact.saturday') }}</dt>
-            <dd>{{ t('contact.closed') }}</dd>
-            <dt>{{ t('contact.sunday') }}</dt>
-            <dd>{{ t('contact.closed') }}</dd>
-          </dl>
-        </section>
+      <div class="container page-body">
+        <div class="cards">
+          <section class="lift reveal">
+            <h2>{{ p.phoneHeading }}</h2>
+            <p class="big"><a [href]="info().phoneHref">{{ info().phone }}</a></p>
+            <a class="button" [href]="info().whatsappHref" rel="noopener">{{ t('cta.whatsapp') }}</a>
+          </section>
+          <section class="lift reveal">
+            <h2>{{ p.addressHeading }}</h2>
+            <p class="big">{{ info().street }}<br />{{ info().city }}</p>
+            <div class="button-row">
+              <a class="button secondary" [href]="info().googleMapsHref" rel="noopener">{{ t('contact.map') }}</a>
+              <a class="button secondary" [href]="info().wazeHref" rel="noopener">{{ t('contact.navigate') }}</a>
+            </div>
+          </section>
+          <section class="lift reveal">
+            <h2>{{ p.emailHeading }}</h2>
+            <p class="big"><a [href]="'mailto:' + info().email">{{ info().email }}</a></p>
+          </section>
+          <section class="lift reveal">
+            <h2>{{ p.hoursHeading }}</h2>
+            <dl>
+              @for (row of info().hours; track $index) {
+                <dt>{{ row.day }}</dt>
+                <dd>{{ row.time }}</dd>
+              }
+            </dl>
+          </section>
+        </div>
       </div>
-    </div>
+    } @else {
+      <app-page-unavailable />
+    }
   `,
   styles: `
     .cards {
@@ -108,5 +113,8 @@ import { SITE_INFO } from '../site-info';
 })
 export class Contact {
   protected readonly t = inject(I18n).t;
-  protected readonly info = SITE_INFO;
+  protected readonly info = inject(SiteInfo).details;
+
+  /** From the route's resolver; null when it could not be loaded. */
+  readonly page = input<ContactPage | null>(null);
 }

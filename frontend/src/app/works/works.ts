@@ -1,52 +1,54 @@
-import { Component, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, input, signal, viewChild } from '@angular/core';
 import { I18n } from '../i18n/i18n';
-import { SERVICE_PHOTOS, SITE_INFO } from '../site-info';
+import { WorksPage } from '../pages/page-api';
+import { PageUnavailable } from '../pages/page-unavailable';
+import { SiteInfo } from '../pages/site-info';
 
 @Component({
   selector: 'app-works',
+  imports: [PageUnavailable],
   template: `
-    <header class="page-head">
-      <div class="container">
-        <p class="eyebrow">XenonFix</p>
-        <h1>{{ t('works.heading') }}</h1>
-        <p class="lead">{{ t('works.intro') }}</p>
-        <div class="button-row social">
-          <a class="button" [href]="info.instagramHref" rel="noopener">Instagram</a>
-          <a class="button secondary" [href]="info.facebookHref" rel="noopener">Facebook</a>
+    @if (page(); as p) {
+      <header class="page-head">
+        <div class="container">
+          <p class="eyebrow">XenonFix</p>
+          <h1>{{ p.heading }}</h1>
+          <p class="lead">{{ p.intro }}</p>
+          <div class="button-row social">
+            <a class="button" [href]="info().instagramUrl" rel="noopener">Instagram</a>
+            <a class="button secondary" [href]="info().facebookUrl" rel="noopener">Facebook</a>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
 
-    <div class="container page-body">
-      <ul class="gallery">
-        @for (service of content().homeServices; track $index) {
-          <li class="reveal">
-            <button type="button" class="photo" (click)="open($index)">
-              <span class="frame zoom">
-                <img
-                  [src]="photos[$index].src"
-                  [alt]="service.title"
-                  [width]="photos[$index].width"
-                  [height]="photos[$index].height"
-                  loading="lazy"
-                />
-              </span>
-              <span class="caption">{{ service.title }}</span>
-            </button>
-          </li>
-        }
-      </ul>
-    </div>
+      <div class="container page-body">
+        <ul class="gallery">
+          @for (photo of p.photos; track $index) {
+            <li class="reveal">
+              <button type="button" class="photo" (click)="open($index)">
+                <span class="frame zoom">
+                  <img
+                    [src]="photo.image.src"
+                    [alt]="photo.caption"
+                    [width]="photo.image.width"
+                    [height]="photo.image.height"
+                    loading="lazy"
+                  />
+                </span>
+                <span class="caption">{{ photo.caption }}</span>
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
+    } @else {
+      <app-page-unavailable />
+    }
 
     <dialog #viewer class="viewer" (click)="close()" (close)="selected.set(null)">
-      @if (selected(); as index) {
-        <img
-          [src]="photos[index - 1].src"
-          [alt]="content().homeServices[index - 1].title"
-          [width]="photos[index - 1].width"
-          [height]="photos[index - 1].height"
-        />
-        <p>{{ content().homeServices[index - 1].title }}</p>
+      @if (shown(); as photo) {
+        <img [src]="photo.image.src" [alt]="photo.caption" [width]="photo.image.width" [height]="photo.image.height" />
+        <p>{{ photo.caption }}</p>
       }
       <button type="button" class="close" [attr.aria-label]="t('works.close')" (click)="close()">×</button>
     </dialog>
@@ -205,15 +207,19 @@ import { SERVICE_PHOTOS, SITE_INFO } from '../site-info';
   `,
 })
 export class Works {
-  private readonly i18n = inject(I18n);
-  protected readonly t = this.i18n.t;
-  protected readonly content = this.i18n.content;
-  protected readonly info = SITE_INFO;
-  protected readonly photos = SERVICE_PHOTOS;
+  protected readonly t = inject(I18n).t;
+  protected readonly info = inject(SiteInfo).details;
+
+  /** From the route's resolver; null when it could not be loaded. */
+  readonly page = input<WorksPage | null>(null);
 
   private readonly viewer = viewChild.required<ElementRef<HTMLDialogElement>>('viewer');
   /** The open photo's position, counted from 1 so that @if treats the first one as present. */
   protected readonly selected = signal<number | null>(null);
+  protected readonly shown = computed(() => {
+    const index = this.selected();
+    return index ? (this.page()?.photos[index - 1] ?? null) : null;
+  });
 
   protected open(index: number): void {
     this.selected.set(index + 1);

@@ -1,0 +1,39 @@
+{
+  "seo": {
+    "title": {
+      "lv": "Kontakti - XenonFix",
+      "ru": "Контакты - XenonFix",
+      "en": "Contact - XenonFix"
+    },
+    "description": {
+      "lv": "XenonFix, Bauskas iela 16c, Rīga. Tālrunis un WhatsApp +371 288 03 119, info@xenonfix.lv. Darba laiks pirmdiena–piektdiena 9:00–17:00.",
+      "ru": "XenonFix, Bauskas iela 16c, Рига. Телефон и WhatsApp +371 288 03 119, info@xenonfix.lv. Время работы: понедельник–пятница 9:00–17:00.",
+      "en": "XenonFix, Bauskas iela 16c, Riga. Phone and WhatsApp +371 288 03 119, info@xenonfix.lv. Open Monday to Friday, 9:00–17:00."
+    }
+  },
+  "heading": {
+    "lv": "Kontakti",
+    "ru": "Контакты",
+    "en": "Contact"
+  },
+  "phoneHeading": {
+    "lv": "Telefons",
+    "ru": "Телефон",
+    "en": "Phone"
+  },
+  "addressHeading": {
+    "lv": "Adrese",
+    "ru": "Адрес",
+    "en": "Address"
+  },
+  "emailHeading": {
+    "lv": "E-pasts",
+    "ru": "Эл. почта",
+    "en": "Email"
+  },
+  "hoursHeading": {
+    "lv": "Darba laiks",
+    "ru": "Время работы",
+    "en": "Opening hours"
+  }
+}

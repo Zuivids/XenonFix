@@ -24,6 +24,7 @@ import { AdminSession } from '../admin-session';
             @if (me.step === 'READY') {
               <a routerLink="/admin/reservations" routerLinkActive="active">Rezervācijas</a>
               <a routerLink="/admin/products" routerLinkActive="active">Produkti</a>
+              <a routerLink="/admin/pages" routerLinkActive="active">Lapas</a>
               <a routerLink="/admin/admins" routerLinkActive="active">Administratori</a>
               <a routerLink="/admin/audit" routerLinkActive="active">Notikumu žurnāls</a>
             }

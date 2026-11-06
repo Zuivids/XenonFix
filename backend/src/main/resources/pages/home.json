@@ -1,0 +1,216 @@
+{
+  "seo": {
+    "title": {
+      "lv": "XenonFix - auto priekšējo lukturu remonts Rīgā",
+      "ru": "XenonFix - ремонт передних автомобильных фар в Риге",
+      "en": "XenonFix - car headlight repair in Riga"
+    },
+    "description": {
+      "lv": "Auto priekšējo lukturu remonts Rīgā: stiklu un reflektoru maiņa, korpusa un vadu remonts, stikla atjaunošana, gaismas stara pārbūve. 10 gadu pieredze un 2 gadu garantija.",
+      "ru": "Ремонт передних автомобильных фар в Риге: замена стёкол и отражателей, ремонт корпуса и проводки, восстановление стекла, переделка светового пучка. 10 лет опыта и 2 года гарантии.",
+      "en": "Car headlight repair in Riga: lens and reflector replacement, housing and wiring repair, lens restoration and beam conversion. 10 years of experience and a 2-year warranty."
+    }
+  },
+  "eyebrow": {
+    "lv": "See the road better",
+    "ru": "See the road better",
+    "en": "See the road better"
+  },
+  "heading": {
+    "lv": "Auto priekšējo lukturu remonts",
+    "ru": "Ремонт передних автомобильных фар",
+    "en": "Car headlight repair"
+  },
+  "intro": {
+    "lv": "Auto lukturu remonta pieredze jau 10 gadi.",
+    "ru": "Опыт ремонта автомобильных фар — уже 10 лет.",
+    "en": "10 years of experience in car headlight repair."
+  },
+  "heroImage": {
+    "src": "/images/service-reflectors.jpg",
+    "width": 800,
+    "height": 600
+  },
+  "heroImageAlt": {
+    "lv": "Atvērts priekšējais lukturis ar lēcām un reflektoriem remonta laikā",
+    "ru": "Вскрытая передняя фара с линзами и отражателями во время ремонта",
+    "en": "An opened headlight with its lenses and reflectors during repair"
+  },
+  "stats": [
+    {
+      "value": "10",
+      "label": {
+        "lv": "gadu pieredze",
+        "ru": "лет опыта",
+        "en": "years of experience"
+      }
+    },
+    {
+      "value": "2",
+      "label": {
+        "lv": "gadu garantija",
+        "ru": "года гарантии",
+        "en": "years of warranty"
+      }
+    },
+    {
+      "value": "14",
+      "label": {
+        "lv": "pakalpojumu veidi",
+        "ru": "видов услуг",
+        "en": "types of service"
+      }
+    }
+  ],
+  "servicesEyebrow": {
+    "lv": "Ko mēs darām",
+    "ru": "Что мы делаем",
+    "en": "What we do"
+  },
+  "servicesHeading": {
+    "lv": "Mūsu pakalpojumi",
+    "ru": "Наши услуги",
+    "en": "Our services"
+  },
+  "allServices": {
+    "lv": "Visi pakalpojumi",
+    "ru": "Все услуги",
+    "en": "All services"
+  },
+  "tiles": [
+    {
+      "image": {
+        "src": "/images/service-glass.jpg",
+        "width": 1200,
+        "height": 900
+      },
+      "title": {
+        "lv": "Stiklu maiņa, pārlīmēšana",
+        "ru": "Замена и переклейка стёкол",
+        "en": "Lens replacement and resealing"
+      },
+      "text": {
+        "lv": "Ir reizes, kad jāliek jauns stikls, bet dažkārt var arī pārlīmēt esošo.",
+        "ru": "Иногда нужно поставить новое стекло, а иногда можно переклеить существующее.",
+        "en": "Sometimes a new lens is needed, and sometimes the existing one can be resealed."
+      }
+    },
+    {
+      "image": {
+        "src": "/images/service-housing.jpg",
+        "width": 800,
+        "height": 1067
+      },
+      "title": {
+        "lv": "Korpusa un vadu remonts",
+        "ru": "Ремонт корпуса и проводки",
+        "en": "Housing and wiring repair"
+      },
+      "text": {
+        "lv": "Kvalitatīvs un glīts korpusa remonts, vadu nomaiņa, ja tie ir apsūbējuši vai sadrupuši.",
+        "ru": "Качественный и аккуратный ремонт корпуса, замена проводов, если они окислились или раскрошились.",
+        "en": "High-quality, tidy housing repair, and wiring replacement if the wires have corroded or crumbled."
+      }
+    },
+    {
+      "image": {
+        "src": "/images/service-restoration.jpg",
+        "width": 800,
+        "height": 1200
+      },
+      "title": {
+        "lv": "Aizsargstikla atjaunošana",
+        "ru": "Восстановление защитного стекла",
+        "en": "Lens restoration"
+      },
+      "text": {
+        "lv": "Lukturu stikla atjaunošana un pārklāšana ar aizsargslāni.",
+        "ru": "Восстановление стекла фары и нанесение защитного слоя.",
+        "en": "Restoring the headlight lens and coating it with a protective layer."
+      }
+    },
+    {
+      "image": {
+        "src": "/images/service-beam.jpg",
+        "width": 477,
+        "height": 604
+      },
+      "title": {
+        "lv": "Gaismas stara maiņa, remonts",
+        "ru": "Замена и ремонт светового пучка",
+        "en": "Light beam conversion and repair"
+      },
+      "text": {
+        "lv": "Gaismas stara pārtaisīšana: EU → UK un UK → EU.",
+        "ru": "Переделка светового пучка: EU → UK и UK → EU.",
+        "en": "Light beam conversion: EU → UK and UK → EU."
+      }
+    },
+    {
+      "image": {
+        "src": "/images/service-reflectors.jpg",
+        "width": 800,
+        "height": 600
+      },
+      "title": {
+        "lv": "Reflektoru maiņa",
+        "ru": "Замена отражателей",
+        "en": "Reflector replacement"
+      },
+      "text": {
+        "lv": "Iespējami arī hromēšanas pakalpojumi nestandarta reflektoriem.",
+        "ru": "Возможно также хромирование нестандартных отражателей.",
+        "en": "Chrome plating is also available for non-standard reflectors."
+      }
+    },
+    {
+      "image": {
+        "src": "/images/service-projects.jpg",
+        "width": 495,
+        "height": 601
+      },
+      "title": {
+        "lv": "Projekti",
+        "ru": "Проекты",
+        "en": "Projects"
+      },
+      "text": {
+        "lv": "Dažāda veida tūnings, krāsošana, cita veida reflektoru aizvietošana.",
+        "ru": "Различный тюнинг, покраска, замена на отражатели другого типа.",
+        "en": "Tuning of all kinds, painting, and replacement with other types of reflectors."
+      }
+    }
+  ],
+  "storeEyebrow": {
+    "lv": "Veikals",
+    "ru": "Магазин",
+    "en": "Store"
+  },
+  "storeHeading": {
+    "lv": "Jaunākie lukturi",
+    "ru": "Новые фары",
+    "en": "Latest headlights"
+  },
+  "ctaHeading": {
+    "lv": "Pirkt jaunus vai remontēt vecos lukturus?",
+    "ru": "Покупать новые фары или ремонтировать старые?",
+    "en": "Buy new headlights or repair the old ones?"
+  },
+  "ctaText": {
+    "lv": "Sazinies ar mums un mēs Tev palīdzēsim! Raksti vai zvani mums.",
+    "ru": "Свяжитесь с нами, и мы вам поможем! Напишите или позвоните нам.",
+    "en": "Get in touch and we will help you! Write to us or give us a call."
+  },
+  "reasons": [
+    {
+      "lv": "Priekšējie lukturi ir viens no svarīgākajiem automašīnas aprīkojuma elementiem, kam ir tieša ietekme uz drošību. Priekšējie lukturi laika gaitā var kļūt miglaini, blāvi, dzelteni vai saskrāpēti, jo jūsu automašīna tiek pakļauta tādiem elementiem kā saules gaisma, netīrumi, sāls, akmeņi u.c.",
+      "ru": "Передние фары — один из важнейших элементов оснащения автомобиля, напрямую влияющий на безопасность. Со временем фары могут стать мутными, тусклыми, жёлтыми или поцарапанными, поскольку автомобиль подвергается воздействию солнечного света, грязи, соли, камней и других факторов.",
+      "en": "Headlights are among the most important parts of a car, with a direct effect on safety. Over time they can become hazy, dull, yellow or scratched, because your car is exposed to sunlight, dirt, salt, stones and more."
+    },
+    {
+      "lv": "Ir svarīgi restaurēt priekšējos lukturus, tiklīdz pamanāt kādu problēmu. Tas ne tikai samazinās Jūsu remontu izmaksas nākotnē, bet arī palīdzēs Jums labāk redzēt un braukt drošāk ar dzidrām gaismām. Turklāt restaurācija ir krietni vien ekonomiskāka alternatīva jaunu priekšējo lukturu iegādei!",
+      "ru": "Важно восстановить передние фары, как только вы заметили проблему. Это не только снизит ваши расходы на ремонт в будущем, но и поможет лучше видеть дорогу и ехать безопаснее с чистым светом. Кроме того, реставрация — намного более экономичная альтернатива покупке новых передних фар!",
+      "en": "It is important to restore your headlights as soon as you notice a problem. This will not only lower your repair costs in the future, but also help you see better and drive more safely with clear lights. Restoration is also a far more economical alternative to buying new headlights!"
+    }
+  ]
+}

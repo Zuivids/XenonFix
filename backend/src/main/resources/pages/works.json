@@ -1,0 +1,98 @@
+{
+  "seo": {
+    "title": {
+      "lv": "Mūsu darbi - XenonFix",
+      "ru": "Наши работы - XenonFix",
+      "en": "Our work - XenonFix"
+    },
+    "description": {
+      "lv": "Veikto lukturu remontu un projektu piemēri. Vairāk bilžu un video Instagram un Facebook kontos.",
+      "ru": "Примеры выполненного ремонта фар и проектов. Больше фото и видео в Instagram и Facebook.",
+      "en": "Examples of our headlight repairs and projects. More photos and videos on Instagram and Facebook."
+    }
+  },
+  "heading": {
+    "lv": "Mūsu darbi",
+    "ru": "Наши работы",
+    "en": "Our work"
+  },
+  "intro": {
+    "lv": "Vairāk bilžu un video no veiktajiem darbiem apskatāmi Instagram un Facebook kontos!",
+    "ru": "Больше фото и видео выполненных работ можно посмотреть в Instagram и Facebook!",
+    "en": "See more photos and videos of our work on Instagram and Facebook!"
+  },
+  "photos": [
+    {
+      "image": {
+        "src": "/images/service-glass.jpg",
+        "width": 1200,
+        "height": 900
+      },
+      "caption": {
+        "lv": "Stiklu maiņa, pārlīmēšana",
+        "ru": "Замена и переклейка стёкол",
+        "en": "Lens replacement and resealing"
+      }
+    },
+    {
+      "image": {
+        "src": "/images/service-housing.jpg",
+        "width": 800,
+        "height": 1067
+      },
+      "caption": {
+        "lv": "Korpusa un vadu remonts",
+        "ru": "Ремонт корпуса и проводки",
+        "en": "Housing and wiring repair"
+      }
+    },
+    {
+      "image": {
+        "src": "/images/service-restoration.jpg",
+        "width": 800,
+        "height": 1200
+      },
+      "caption": {
+        "lv": "Aizsargstikla atjaunošana",
+        "ru": "Восстановление защитного стекла",
+        "en": "Lens restoration"
+      }
+    },
+    {
+      "image": {
+        "src": "/images/service-beam.jpg",
+        "width": 477,
+        "height": 604
+      },
+      "caption": {
+        "lv": "Gaismas stara maiņa, remonts",
+        "ru": "Замена и ремонт светового пучка",
+        "en": "Light beam conversion and repair"
+      }
+    },
+    {
+      "image": {
+        "src": "/images/service-reflectors.jpg",
+        "width": 800,
+        "height": 600
+      },
+      "caption": {
+        "lv": "Reflektoru maiņa",
+        "ru": "Замена отражателей",
+        "en": "Reflector replacement"
+      }
+    },
+    {
+      "image": {
+        "src": "/images/service-projects.jpg",
+        "width": 495,
+        "height": 601
+      },
+      "caption": {
+        "lv": "Projekti",
+        "ru": "Проекты",
+        "en": "Projects"
+      }
+    }
+  ]
+}

@@ -19,7 +19,7 @@
       }
     </nav>
     <div class="header-end">
-      <a class="header-phone" [href]="info.phoneHref">{{ info.phone }}</a>
+      <a class="header-phone" [href]="info().phoneHref">{{ info().phone }}</a>
       <app-language-switcher />
       <button
         type="button"
@@ -45,8 +45,8 @@
   <div class="container footer-top">
     <img src="logo.png" alt="XenonFix" width="644" height="192" loading="lazy" />
     <div class="button-row">
-      <a class="button" [href]="info.phoneHref">{{ t('cta.call') }} {{ info.phone }}</a>
-      <a class="button secondary" [href]="info.whatsappHref" rel="noopener">{{ t('cta.whatsapp') }}</a>
+      <a class="button" [href]="info().phoneHref">{{ t('cta.call') }} {{ info().phone }}</a>
+      <a class="button secondary" [href]="info().whatsappHref" rel="noopener">{{ t('cta.whatsapp') }}</a>
     </div>
   </div>
   <div class="container footer-columns">
@@ -69,27 +69,27 @@
     <div>
       <h2>{{ t('nav.contact') }}</h2>
       <ul>
-        <li>{{ info.street }}, {{ info.city }}</li>
-        <li><a [href]="info.phoneHref">{{ info.phone }}</a></li>
-        <li><a [href]="'mailto:' + info.email">{{ info.email }}</a></li>
+        <li>{{ info().street }}, {{ info().city }}</li>
+        <li><a [href]="info().phoneHref">{{ info().phone }}</a></li>
+        <li><a [href]="'mailto:' + info().email">{{ info().email }}</a></li>
         <li>
-          <a [href]="info.instagramHref" rel="noopener">Instagram</a> ·
-          <a [href]="info.facebookHref" rel="noopener">Facebook</a>
+          <a [href]="info().instagramUrl" rel="noopener">Instagram</a> ·
+          <a [href]="info().facebookUrl" rel="noopener">Facebook</a>
         </li>
       </ul>
     </div>
     <div>
       <h2>{{ t('footer.details') }}</h2>
       <ul>
-        <li>{{ info.companyName }}</li>
-        <li>{{ t('footer.registration') }} {{ info.registrationNumber }}</li>
-        <li>{{ t('footer.vat') }} {{ info.vatNumber }}</li>
-        <li>{{ t('footer.account') }}: {{ info.bankAccount }}</li>
+        <li>{{ info().companyName }}</li>
+        <li>{{ t('footer.registration') }} {{ info().registrationNumber }}</li>
+        <li>{{ t('footer.vat') }} {{ info().vatNumber }}</li>
+        <li>{{ t('footer.account') }}: {{ info().bankAccount }}</li>
       </ul>
     </div>
   </div>
   <p class="container copyright">
-    © {{ year }} {{ info.companyName }} ·
+    © {{ year }} {{ info().companyName }} ·
     <a [routerLink]="'/privatuma-politika' | localized">{{ t('privacy.heading') }}</a>
   </p>
 </footer>

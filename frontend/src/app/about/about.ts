@@ -1,55 +1,61 @@
-import { Component, inject } from '@angular/core';
-import { I18n } from '../i18n/i18n';
+import { Component, input } from '@angular/core';
+import { AboutPage } from '../pages/page-api';
+import { PageUnavailable } from '../pages/page-unavailable';
 
 @Component({
   selector: 'app-about',
+  imports: [PageUnavailable],
   template: `
-    <header class="page-head">
-      <div class="container">
-        <p class="eyebrow">XenonFix</p>
-        <h1>{{ t('about.heading') }}</h1>
-        <p class="lead">{{ t('about.lead') }}</p>
+    @if (page(); as p) {
+      <header class="page-head">
+        <div class="container">
+          <p class="eyebrow">XenonFix</p>
+          <h1>{{ p.heading }}</h1>
+          <p class="lead">{{ p.lead }}</p>
+        </div>
+      </header>
+
+      <div class="container page-body">
+        <ol class="promises">
+          @for (paragraph of p.points; track $index) {
+            <li class="lift reveal">
+              <span class="number" aria-hidden="true">{{ number($index) }}</span>
+              <p>{{ paragraph }}</p>
+            </li>
+          }
+        </ol>
+
+        <section class="goal reveal">
+          <h2 class="section-title">{{ p.goalHeading }}</h2>
+          <div>
+            @for (paragraph of p.goal; track $index) {
+              <p>{{ paragraph }}</p>
+            }
+          </div>
+        </section>
+
+        <section class="manager">
+          <div class="portrait zoom reveal">
+            <img
+              [src]="p.managerImage.src"
+              [alt]="p.managerName"
+              [width]="p.managerImage.width"
+              [height]="p.managerImage.height"
+              loading="lazy"
+            />
+          </div>
+          <div class="reveal">
+            <p class="eyebrow">{{ p.managerRole }}</p>
+            <h2 class="section-title">{{ p.managerName }}</h2>
+            @for (paragraph of p.manager; track $index) {
+              <p>{{ paragraph }}</p>
+            }
+          </div>
+        </section>
       </div>
-    </header>
-
-    <div class="container page-body">
-      <ol class="promises">
-        @for (paragraph of content().aboutIntro; track $index) {
-          <li class="lift reveal">
-            <span class="number" aria-hidden="true">0{{ $index + 1 }}</span>
-            <p>{{ paragraph }}</p>
-          </li>
-        }
-      </ol>
-
-      <section class="goal reveal">
-        <h2 class="section-title">{{ t('about.goalHeading') }}</h2>
-        <div>
-          @for (paragraph of content().aboutGoal; track $index) {
-            <p>{{ paragraph }}</p>
-          }
-        </div>
-      </section>
-
-      <section class="manager">
-        <div class="portrait zoom reveal">
-          <img
-            src="images/ugis-zvingulis.jpg"
-            [alt]="t('about.managerName')"
-            width="640"
-            height="960"
-            loading="lazy"
-          />
-        </div>
-        <div class="reveal">
-          <p class="eyebrow">{{ t('about.managerRole') }}</p>
-          <h2 class="section-title">{{ t('about.managerName') }}</h2>
-          @for (paragraph of content().aboutManager; track $index) {
-            <p>{{ paragraph }}</p>
-          }
-        </div>
-      </section>
-    </div>
+    } @else {
+      <app-page-unavailable />
+    }
   `,
   styles: `
     .promises {
@@ -125,7 +131,10 @@ import { I18n } from '../i18n/i18n';
   `,
 })
 export class About {
-  private readonly i18n = inject(I18n);
-  protected readonly t = this.i18n.t;
-  protected readonly content = this.i18n.content;
+  /** From the route's resolver; null when it could not be loaded. */
+  readonly page = input<AboutPage | null>(null);
+
+  protected number(index: number): string {
+    return String(index + 1).padStart(2, '0');
+  }
 }

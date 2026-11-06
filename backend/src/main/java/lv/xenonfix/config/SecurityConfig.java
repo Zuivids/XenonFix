@@ -59,6 +59,8 @@ class SecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/api/health", "/uploads/**").permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/store/products", "/api/store/products/*", "/api/store/sitemap")
 				.permitAll()
+				// The editable pages as the site shows them, in one language
+				.requestMatchers(HttpMethod.GET, "/api/pages/*").permitAll()
 				.requestMatchers(HttpMethod.POST, RESERVATIONS_PATH).permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/admin/auth/csrf").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/admin/auth/login").permitAll()

@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
  * carried, including the GPS position that phones store in photos.
  */
 @Component
-class ImageProcessor {
+public class ImageProcessor {
 
 	private static final Set<String> ACCEPTED_FORMATS = Set.of("jpeg", "png");
 
@@ -48,7 +48,8 @@ class ImageProcessor {
 
 	private static final float JPEG_QUALITY = 0.85f;
 
-	Processed process(byte[] file) {
+	/** Also used for the photos of the editable pages. */
+	public Processed process(byte[] file) {
 		BufferedImage upright;
 		try {
 			upright = rotateUpright(decode(file), orientation(file));
@@ -176,7 +177,7 @@ class ImageProcessor {
 		return new ApiException(HttpStatus.BAD_REQUEST, "INVALID_IMAGE");
 	}
 
-	record Processed(byte[] full, byte[] thumbnail, int width, int height) {
+	public record Processed(byte[] full, byte[] thumbnail, int width, int height) {
 	}
 
 }

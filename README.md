@@ -83,7 +83,10 @@ The panel is at `/admin`, in Latvian only, and is not indexed by search engines.
   product, amounts, status and dates. An anonymized reservation can no longer be changed. Every night
   at 03:30 the same happens to cancelled and completed reservations not changed for
   `app.reservation.retention` (183 days, the policy's "6 months"). The privacy policy states this period: change both together.
-- **Audit log:** logins, password changes, and changes to admins, products and reservations, in `audit_log`.
+- **Pages ("Lapas"):** the texts, headings and photos of the home page, Par mums, Mūsu pakalpojumi,
+  Mūsu darbi and Kontakti, and the shop's contact details used everywhere, in three languages. See
+  "Editable pages" below.
+- **Audit log:** logins, password changes, and changes to admins, products, pages and reservations, in `audit_log`.
   Never write passwords to it. Later features add their own event types.
 
 ### Two-step login
@@ -138,6 +141,31 @@ that is not translated falls back to Latvian.
 - **On a server** set `SPRING_MAIL_HOST` and the other `SPRING_MAIL_*` settings, or the backend does
   not start. Set `BACKEND_URL` for the frontend server if the backend is not at
   `http://localhost:8090`.
+
+## Editable pages
+
+The home page, Par mums, Mūsu pakalpojumi, Mūsu darbi and Kontakti, and the contact details
+(phone, email, address, opening hours, social links, company details), are edited in the panel under
+"Lapas". The design stays fixed: each heading, text and photo is a field, and lists can be added to,
+removed from and reordered.
+
+- **Storage:** one row per page in the `page` table, holding a JSON document with all three
+  languages; each text is `{lv, ru, en}`. Its shape is a record in `lv.xenonfix.page.content`, and a
+  save that does not fit it is refused. Latvian is required; the site shows Latvian where Russian or
+  English is empty.
+- **Starting content:** `backend/src/main/resources/pages/*.json`, today's texts. A page without a row
+  gets its file at startup; an edited page is never replaced. To change a page's fields, change its
+  record, its JSON file, the frontend types in `pages/page-api.ts` and the editor in
+  `admin/pages/page-schemas.ts` together. A stored page that no longer fits needs a migration.
+- **Photos:** resized and cleaned like product photos, in `pages/` under the uploads folder, so the
+  existing backup covers them. Saving deletes a page's photos it no longer uses. Uploads never saved
+  into a page are deleted after a day, at night.
+- **The site** reads pages from `GET /api/pages/{page}?lang=`. When the backend cannot be reached they
+  show a short "not available" message (503). The header and footer then fall back to the built-in
+  contact details in `pages/site-info.ts`.
+- **Contact details** also go into the customer emails (address, phone, email, company).
+- **The legal texts** (payment, delivery and warranty terms, privacy policy) stay in
+  `i18n/content.*.ts`, and short interface texts in `i18n/messages.*.ts`.
 
 ## Languages
 

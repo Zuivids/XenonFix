@@ -39,6 +39,21 @@ export const adminRoutes: Routes = [
         loadComponent: () => import('./reservations/reservation-detail').then((m) => m.ReservationDetail),
       },
       {
+        path: 'pages',
+        title: 'Lapas - XenonFix',
+        loadComponent: () => import('./pages/page-list').then((m) => m.PageList),
+      },
+      {
+        path: 'pages/:page',
+        title: 'Lapas rediģēšana - XenonFix',
+        loadComponent: () => import('./pages/page-editor').then((m) => m.PageEditor),
+        // Leaving with unsaved changes asks first
+        canDeactivate: [
+          (editor: { dirty: () => boolean }) =>
+            !editor.dirty() || window.confirm('Lapā ir nesaglabātas izmaiņas. Aiziet un tās zaudēt?'),
+        ],
+      },
+      {
         path: 'admins',
         title: 'Administratori - XenonFix',
         loadComponent: () => import('./admins/admin-list').then((m) => m.AdminList),

@@ -4,6 +4,7 @@ import { RouterStateSnapshot, TitleStrategy } from '@angular/router';
 import { I18n } from '../i18n/i18n';
 import { DEFAULT_LANGUAGE, Language, LANGUAGES, localizedPath, pagePath } from '../i18n/languages';
 import type { MessageKey } from '../i18n/messages.lv';
+import type { Seo } from '../pages/page-api';
 import type { ProductLookup } from '../store/store.resolvers';
 
 // Fixed rather than taken from the request: a test server must not call itself canonical
@@ -52,14 +53,16 @@ export class SeoTitleStrategy extends TitleStrategy {
     this.document.documentElement.setAttribute('lang', this.i18n.language());
     const lookup = route.data['lookup'] as ProductLookup | undefined;
     const product = lookup?.state === 'found' ? lookup.product : null;
+    // An editable page has its own title and description, as edited in the admin panel
+    const seo = (route.data['page'] as { seo?: Seo } | null | undefined)?.seo;
     // A backend problem does not mean the product is gone, so it is not called "not found"
     const titleKey = lookup?.state === 'unavailable' ? 'store.title' : (route.title as MessageKey);
-    this.title.setTitle(product ? `${product.name} - XenonFix` : this.i18n.t(titleKey));
+    this.title.setTitle(product ? `${product.name} - XenonFix` : (seo?.title ?? this.i18n.t(titleKey)));
     this.meta.updateTag({
       name: 'description',
       content: product
         ? productDescription(product.description, this.i18n.t('store.description'))
-        : this.i18n.t(route.data['description'] as MessageKey),
+        : (seo?.description ?? this.i18n.t(route.data['description'] as MessageKey)),
     });
     this.updateLinks(pagePath(snapshot.url));
   }

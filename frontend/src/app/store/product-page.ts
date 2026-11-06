@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { I18n } from '../i18n/i18n';
 import { LocalizedPipe } from '../i18n/localized-link.pipe';
 import { NotFound } from '../not-found/not-found';
-import { SITE_INFO } from '../site-info';
+import { SiteInfo } from '../pages/site-info';
 import { Price } from './price';
 import { ReservationForm } from './reservation-form';
 import { StoreApi, StoreProduct } from './store-api';
@@ -21,7 +21,7 @@ export class ProductPage {
   private readonly i18n = inject(I18n);
 
   protected readonly t = this.i18n.t;
-  protected readonly info = SITE_INFO;
+  protected readonly info = inject(SiteInfo).details;
 
   /** From the route's resolver (see withComponentInputBinding). */
   readonly lookup = input<ProductLookup>();

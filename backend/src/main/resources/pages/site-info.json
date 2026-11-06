@@ -1,0 +1,51 @@
+{
+  "phone": "+371 288 03 119",
+  "whatsapp": "+371 288 03 119",
+  "email": "info@xenonfix.lv",
+  "street": "Bauskas iela 16c",
+  "city": "Rīga, LV-1004",
+  "hours": [
+    {
+      "day": {
+        "lv": "Pirmdiena – piektdiena",
+        "ru": "Понедельник – пятница",
+        "en": "Monday – Friday"
+      },
+      "time": {
+        "lv": "9:00–17:00",
+        "ru": "9:00–17:00",
+        "en": "9:00–17:00"
+      }
+    },
+    {
+      "day": {
+        "lv": "Sestdiena",
+        "ru": "Суббота",
+        "en": "Saturday"
+      },
+      "time": {
+        "lv": "Brīvdiena",
+        "ru": "Выходной",
+        "en": "Closed"
+      }
+    },
+    {
+      "day": {
+        "lv": "Svētdiena",
+        "ru": "Воскресенье",
+        "en": "Sunday"
+      },
+      "time": {
+        "lv": "Brīvdiena",
+        "ru": "Выходной",
+        "en": "Closed"
+      }
+    }
+  ],
+  "instagramUrl": "https://www.instagram.com/xenonfix/",
+  "facebookUrl": "https://www.facebook.com/profile.php?id=100090952901221",
+  "companyName": "SIA Elekanga",
+  "registrationNumber": "40203498222",
+  "vatNumber": "LV40203498222",
+  "bankAccount": "LV92HABA0551055135877"
+}

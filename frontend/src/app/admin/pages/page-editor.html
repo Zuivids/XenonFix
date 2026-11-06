@@ -1,0 +1,178 @@
+<p><a routerLink="/admin/pages">← Visas lapas</a></p>
+
+@if (schema(); as schema) {
+  <div class="heading">
+    <h1>{{ schema.name }}</h1>
+    <a class="view" [href]="schema.publicPath" target="_blank" rel="noopener">Skatīt lapā ↗</a>
+  </div>
+  <p class="hint">
+    {{ schema.description }}
+    @if (updated(); as updated) {
+      @if (updated.by) {
+        Pēdējo reizi saglabāja {{ updated.by }}, {{ updated.at | date: 'dd.MM.yyyy HH:mm' }}.
+      } @else {
+        Vēl nav mainīta.
+      }
+    }
+  </p>
+
+  @if (content(); as content) {
+    <div class="toolbar">
+      <div class="languages" role="tablist" aria-label="Valoda">
+        @for (lang of languages; track lang.code) {
+          <button
+            type="button"
+            role="tab"
+            class="tab"
+            [class.active]="language() === lang.code"
+            [attr.aria-selected]="language() === lang.code"
+            (click)="language.set(lang.code)"
+          >
+            {{ lang.name }}
+          </button>
+        }
+      </div>
+      <div class="save">
+        @if (saved()) {
+          <span role="status">Saglabāts. Lapa jau rāda izmaiņas.</span>
+        } @else if (dirty()) {
+          <span class="unsaved">Ir nesaglabātas izmaiņas</span>
+        }
+        <button type="button" [disabled]="busy() || !!uploading()" (click)="save()">Saglabāt</button>
+      </div>
+    </div>
+    @if (language() !== 'lv') {
+      <p class="hint">Tukšā laukā lapa rāda latvisko tekstu, kas te redzams pelēkā krāsā.</p>
+    }
+
+    @if (error(); as message) {
+      <div class="error" role="alert">
+        <p>{{ message }}</p>
+        @if (problemList().length) {
+          <ul>
+            @for (problem of problemList().slice(0, 8); track problem.path) {
+              <li>{{ problem.message }}</li>
+            }
+          </ul>
+        }
+        @if (changedByAnother()) {
+          <button type="button" class="secondary" (click)="load()">Ielādēt saglabāto (jūsu izmaiņas zudīs)</button>
+        }
+      </div>
+    }
+
+    <form class="page-form" (submit)="$event.preventDefault(); save()">
+      <ng-container *ngTemplateOutlet="fieldsTemplate; context: { $implicit: schema.fields, target: content, prefix: '' }" />
+    </form>
+  } @else if (error(); as message) {
+    <p class="error" role="alert">{{ message }}</p>
+  }
+}
+
+<ng-template #fieldsTemplate let-fields let-target="target" let-prefix="prefix">
+  @for (field of fields; track $index) {
+    @switch (field.kind) {
+      @case ('section') {
+        <fieldset class="section">
+          <legend>{{ field.label }}</legend>
+          <ng-container *ngTemplateOutlet="fieldsTemplate; context: { $implicit: field.fields, target: target, prefix: prefix }" />
+        </fieldset>
+      }
+      @case ('text') {
+        <label [class.invalid]="invalid(prefix + field.key)">
+          {{ field.label }}
+          @if (field.multiline) {
+            <textarea
+              rows="4"
+              [value]="text(target, field.key)"
+              [placeholder]="latvian(target, field.key)"
+              (input)="setText(target, field.key, $event)"
+            ></textarea>
+          } @else {
+            <input
+              type="text"
+              [value]="text(target, field.key)"
+              [placeholder]="latvian(target, field.key)"
+              (input)="setText(target, field.key, $event)"
+            />
+          }
+          @if (field.hint) {
+            <span class="hint">{{ field.hint }}</span>
+          }
+        </label>
+      }
+      @case ('plain') {
+        <label [class.invalid]="invalid(prefix + field.key)">
+          {{ field.label }} <span class="same">visās valodās</span>
+          <input [type]="field.type ?? 'text'" [value]="plain(target, field.key)" (input)="setPlain(target, field.key, $event)" />
+          @if (field.hint) {
+            <span class="hint">{{ field.hint }}</span>
+          }
+        </label>
+      }
+      @case ('image') {
+        <div class="image-field" [class.invalid]="invalid(prefix + field.key)">
+          <span class="label">{{ field.label }} <span class="same">visās valodās</span></span>
+          @if (image(target, field.key); as current) {
+            <img [src]="current.src" alt="" [width]="current.width" [height]="current.height" />
+          } @else {
+            <p class="no-image">Foto nav izvēlēts</p>
+          }
+          <label class="upload">
+            <span class="button-like">{{ uploading() === prefix + field.key ? 'Augšupielādē…' : (image(target, field.key) ? 'Mainīt foto' : 'Izvēlēties foto') }}</span>
+            <input
+              type="file"
+              accept="image/jpeg,image/png"
+              [disabled]="!!uploading()"
+              (change)="upload(target, field.key, prefix + field.key, $event)"
+            />
+          </label>
+          @if (field.hint) {
+            <span class="hint">{{ field.hint }}</span>
+          }
+        </div>
+      }
+      @case ('list') {
+        <fieldset class="list" [class.invalid]="invalid(prefix + field.key)">
+          <legend>{{ field.label }} <span class="count">{{ items(target, field.key).length }} no {{ field.max }}</span></legend>
+          @for (item of items(target, field.key); track item; let index = $index, first = $first, last = $last) {
+            <div class="item">
+              <div class="item-head">
+                <span>{{ field.itemLabel }} {{ index + 1 }}</span>
+                <span class="item-actions">
+                  <button type="button" class="secondary small" [disabled]="first" (click)="move(target, field.key, index, -1)" [attr.aria-label]="field.itemLabel + ' ' + (index + 1) + ' uz augšu'">↑</button>
+                  <button type="button" class="secondary small" [disabled]="last" (click)="move(target, field.key, index, 1)" [attr.aria-label]="field.itemLabel + ' ' + (index + 1) + ' uz leju'">↓</button>
+                  <button
+                    type="button"
+                    class="secondary small"
+                    [disabled]="items(target, field.key).length <= (field.min ?? 0)"
+                    (click)="remove(target, field.key, index)"
+                  >
+                    Dzēst
+                  </button>
+                </span>
+              </div>
+              @if (field.fields) {
+                <ng-container
+                  *ngTemplateOutlet="fieldsTemplate; context: { $implicit: field.fields, target: item, prefix: prefix + field.key + '[' + index + '].' }"
+                />
+              } @else {
+                <label [class.invalid]="invalid(prefix + field.key + '[' + index + ']')">
+                  <span class="visually-hidden">{{ field.itemLabel }} {{ index + 1 }}</span>
+                  @if (field.multiline) {
+                    <textarea rows="4" [value]="text(item, null)" [placeholder]="latvian(item, null)" (input)="setText(item, null, $event)"></textarea>
+                  } @else {
+                    <input type="text" [value]="text(item, null)" [placeholder]="latvian(item, null)" (input)="setText(item, null, $event)" />
+                  }
+                </label>
+              }
+            </div>
+          }
+          <button type="button" class="secondary" [disabled]="items(target, field.key).length >= field.max" (click)="add(target, field)">
+            + Pievienot: {{ field.itemLabel.toLowerCase() }}
+          </button>
+        </fieldset>
+      }
+    }
+  }
+</ng-template>

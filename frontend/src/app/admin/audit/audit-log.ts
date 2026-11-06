@@ -27,6 +27,7 @@ const EVENT_NAMES: Record<string, string> = {
   MFA_ENABLED: 'Iestatīta divpakāpju pieslēgšanās',
   MFA_RECOVERY_CODES_RENEWED: 'Izveidoti jauni rezerves kodi',
   ADMIN_MFA_RESET: 'Atiestatīta administratora divpakāpju pieslēgšanās',
+  PAGE_UPDATED: 'Mainīta lapa',
   RESERVATION_CREATED: 'Jauna rezervācija',
   RESERVATION_STATUS_CHANGED: 'Mainīts rezervācijas statuss',
   RESERVATION_NOTE_CHANGED: 'Mainītas rezervācijas piezīmes',

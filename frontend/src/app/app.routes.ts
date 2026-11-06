@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { inject, Type } from '@angular/core';
 import { Route, Routes } from '@angular/router';
 import { About } from './about/about';
 import { Contact } from './contact/contact';
@@ -7,6 +7,8 @@ import { Home } from './home/home';
 import { I18n } from './i18n/i18n';
 import { Language, languagePrefix } from './i18n/languages';
 import { NotFound } from './not-found/not-found';
+import { PageName } from './pages/page-api';
+import { pageResolver, siteInfoResolver } from './pages/page.resolvers';
 import { Services } from './services/services';
 import { SiteLayout } from './site-layout/site-layout';
 import { ProductPage } from './store/product-page';
@@ -15,19 +17,28 @@ import { featuredProductsResolver, productResolver, storePageResolver } from './
 import { Works } from './works/works';
 
 /**
+ * A page whose content is edited in the admin panel. Its title and description come from that
+ * content (SeoTitleStrategy); the general ones are for when it cannot be loaded.
+ */
+function editable(path: string, component: Type<unknown>, page: PageName): Route {
+  return {
+    path,
+    component,
+    title: 'home.title',
+    data: { description: 'home.description' },
+    resolve: { page: pageResolver(page) },
+  };
+}
+
+/**
  * The public pages, the same under each language's prefix. The paths are the old site's, so
  * existing links keep working. Route titles and descriptions are message keys.
  */
 const PAGES: Route[] = [
-  { path: 'par-mums', component: About, title: 'about.title', data: { description: 'about.description' } },
-  {
-    path: 'musu-pakalpojumi',
-    component: Services,
-    title: 'services.title',
-    data: { description: 'services.description' },
-  },
-  { path: 'musu-darbi', component: Works, title: 'works.title', data: { description: 'works.description' } },
-  { path: 'kontakti', component: Contact, title: 'contact.title', data: { description: 'contact.description' } },
+  editable('par-mums', About, 'about'),
+  editable('musu-pakalpojumi', Services, 'services'),
+  editable('musu-darbi', Works, 'works'),
+  editable('kontakti', Contact, 'contact'),
   {
     path: 'store',
     component: StoreList,
@@ -87,7 +98,7 @@ function languageRoutes(language: Language): Route {
   return {
     path: languagePrefix(language),
     component: SiteLayout,
-    resolve: { messages: () => inject(I18n).use(language) },
+    resolve: { messages: () => inject(I18n).use(language), siteInfo: siteInfoResolver },
     children: [
       {
         path: '',
@@ -95,7 +106,7 @@ function languageRoutes(language: Language): Route {
         component: Home,
         title: 'home.title',
         data: { description: 'home.description' },
-        resolve: { featured: featuredProductsResolver },
+        resolve: { featured: featuredProductsResolver, page: pageResolver('home') },
       },
       ...PAGES,
       PRODUCT_ROUTE,

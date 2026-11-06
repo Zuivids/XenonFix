@@ -1,38 +1,42 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { I18n } from '../i18n/i18n';
 import { LocalizedPipe } from '../i18n/localized-link.pipe';
-import { SITE_INFO } from '../site-info';
+import { ServicesPage } from '../pages/page-api';
+import { PageUnavailable } from '../pages/page-unavailable';
+import { SiteInfo } from '../pages/site-info';
 
 @Component({
   selector: 'app-services',
-  imports: [LocalizedPipe, RouterLink],
+  imports: [LocalizedPipe, PageUnavailable, RouterLink],
   template: `
-    <header class="page-head">
-      <div class="container">
-        <p class="eyebrow">{{ t('home.servicesEyebrow') }}</p>
-        <h1>{{ t('services.heading') }}</h1>
-        <p class="lead">{{ t('services.warrantyNote') }}</p>
-      </div>
-    </header>
+    @if (page(); as p) {
+      <header class="page-head">
+        <div class="container">
+          <p class="eyebrow">{{ p.eyebrow }}</p>
+          <h1>{{ p.heading }}</h1>
+          <p class="lead">{{ p.lead }}</p>
+        </div>
+      </header>
 
-    <div class="container page-body">
-      <ul class="services">
-        @for (service of content().services; track $index) {
-          <li class="lift reveal">
-            <span class="number" aria-hidden="true">{{ number($index) }}</span>
-            <h2>{{ service.title }}</h2>
-            <p>{{ service.text }}</p>
-          </li>
-        }
-      </ul>
-      <div class="button-row reveal">
-        <a class="button" [href]="info.phoneHref">{{ t('cta.call') }} {{ info.phone }}</a>
-        <a class="button secondary" [routerLink]="'/garantijas-nosacijumi' | localized">
-          {{ t('services.warrantyLink') }}
-        </a>
+      <div class="container page-body">
+        <ul class="services">
+          @for (service of p.services; track $index) {
+            <li class="lift reveal">
+              <span class="number" aria-hidden="true">{{ number($index) }}</span>
+              <h2>{{ service.title }}</h2>
+              <p>{{ service.text }}</p>
+            </li>
+          }
+        </ul>
+        <div class="button-row reveal">
+          <a class="button" [href]="info().phoneHref">{{ t('cta.call') }} {{ info().phone }}</a>
+          <a class="button secondary" [routerLink]="'/garantijas-nosacijumi' | localized">{{ p.warrantyLink }}</a>
+        </div>
       </div>
-    </div>
+    } @else {
+      <app-page-unavailable />
+    }
   `,
   styles: `
     .services {
@@ -71,10 +75,11 @@ import { SITE_INFO } from '../site-info';
   `,
 })
 export class Services {
-  private readonly i18n = inject(I18n);
-  protected readonly t = this.i18n.t;
-  protected readonly content = this.i18n.content;
-  protected readonly info = SITE_INFO;
+  protected readonly t = inject(I18n).t;
+  protected readonly info = inject(SiteInfo).details;
+
+  /** From the route's resolver; null when it could not be loaded. */
+  readonly page = input<ServicesPage | null>(null);
 
   protected number(index: number): string {
     return String(index + 1).padStart(2, '0');

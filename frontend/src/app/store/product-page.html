@@ -47,8 +47,8 @@
           }
           <p>{{ t('store.outOfStockHelp') }}</p>
           <div class="button-row">
-            <a class="button" [href]="info.phoneHref">{{ t('cta.call') }} {{ info.phone }}</a>
-            <a class="button secondary" [href]="info.whatsappHref" rel="noopener">{{ t('cta.whatsapp') }}</a>
+            <a class="button" [href]="info().phoneHref">{{ t('cta.call') }} {{ info().phone }}</a>
+            <a class="button secondary" [href]="info().whatsappHref" rel="noopener">{{ t('cta.whatsapp') }}</a>
           </div>
         </div>
       }

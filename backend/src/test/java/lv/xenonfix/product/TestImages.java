@@ -8,13 +8,13 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-final class TestImages {
+public final class TestImages {
 
 	private TestImages() {
 	}
 
 	/** A photo whose top-left quarter is red, so tests can see how it was turned. */
-	static byte[] encoded(String format, int width, int height) throws IOException {
+	public static byte[] encoded(String format, int width, int height) throws IOException {
 		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphics = image.createGraphics();
 		graphics.setColor(Color.BLUE);

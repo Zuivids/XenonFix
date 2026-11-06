@@ -4,6 +4,8 @@ import { of, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { App } from './app';
 import { PAGE_PATHS, routes } from './app.routes';
+import { PageApi } from './pages/page-api';
+import { stubPageApi } from './pages/testing/starting-pages';
 import { SeoTitleStrategy } from './seo/seo-title-strategy';
 import { StoreApi, StoreProduct, StoreProductSummary } from './store/store-api';
 
@@ -53,13 +55,17 @@ function hrefs(root: HTMLElement, selector = '.language-switcher a') {
 }
 
 describe('App', () => {
+  let pages: ReturnType<typeof stubPageApi>;
+
   beforeEach(() => {
+    pages = stubPageApi();
     TestBed.configureTestingModule({
       imports: [App],
       providers: [
         provideRouter(routes, withComponentInputBinding()),
         { provide: TitleStrategy, useClass: SeoTitleStrategy },
         { provide: StoreApi, useValue: STUB_API },
+        { provide: PageApi, useValue: pages },
       ],
     });
     store.items = [];
@@ -227,6 +233,74 @@ describe('App', () => {
     expect(root.querySelector('[role="alert"]')?.textContent).toContain('nav pieejams');
     expect(document.title).toBe('Veikals - XenonFix');
     api.get = STUB_API.get!;
+  });
+
+  it('shows the pages as edited, with Latvian where a translation is empty', async () => {
+    const about = pages.pages.about as { heading: Record<string, string>; points: Record<string, string>[] };
+    about.heading = { lv: 'Par mums jauns', ru: '', en: 'About us, new' };
+    about.points.push({ lv: 'Piektais punkts', ru: 'Пятый пункт', en: '' });
+
+    const ru = (await appAt('/ru/par-mums')).nativeElement as HTMLElement;
+    expect(ru.querySelector('h1')?.textContent).toBe('Par mums jauns');
+    expect(ru.querySelectorAll('.promises li')).toHaveLength(5);
+    expect(ru.querySelector('.promises li:last-child')?.textContent).toContain('Пятый пункт');
+
+    const en = (await appAt('/en/par-mums')).nativeElement as HTMLElement;
+    expect(en.querySelector('h1')?.textContent).toBe('About us, new');
+    expect(en.querySelector('.promises li:last-child')?.textContent).toContain('Piektais punkts');
+  });
+
+  it('uses the edited title and description of a page', async () => {
+    (pages.pages.works as { seo: { title: Record<string, string> } }).seo.title = {
+      lv: 'Darbi - XenonFix',
+      ru: '',
+      en: '',
+    };
+
+    await appAt('/musu-darbi');
+
+    expect(document.title).toBe('Darbi - XenonFix');
+  });
+
+  it('shows the edited contact details in the header, footer and pages', async () => {
+    Object.assign(pages.pages['site-info'] as object, {
+      phone: '+371 200 00 999',
+      street: 'Jaunā iela 1',
+      hours: [{ day: { lv: 'Katru dienu', ru: '', en: 'Every day' }, time: { lv: '8:00–20:00', ru: '', en: '' } }],
+    });
+
+    const root = (await appAt('/en/kontakti')).nativeElement as HTMLElement;
+
+    expect(root.querySelector('.header-phone')?.getAttribute('href')).toBe('tel:+37120000999');
+    expect(root.querySelector('main a[href="tel:+37120000999"]')?.textContent).toBe('+371 200 00 999');
+    expect(root.querySelector('footer')?.textContent).toContain('Jaunā iela 1');
+    expect(root.querySelector('main dl')?.textContent).toContain('Every day');
+    expect(root.querySelector('main dl')?.textContent).toContain('8:00–20:00');
+    expect(root.querySelector('main a[href*="google.com/maps"]')?.getAttribute('href')).toContain('Jaun%C4%81%20iela%201');
+  });
+
+  it('shows the gallery as edited, separate from the home page tiles', async () => {
+    const works = pages.pages.works as { photos: unknown[] };
+    works.photos = [works.photos[2], works.photos[0]];
+
+    const root = (await appAt('/musu-darbi')).nativeElement as HTMLElement;
+
+    expect([...root.querySelectorAll('.gallery img')].map((img) => img.getAttribute('src'))).toEqual([
+      '/images/service-restoration.jpg',
+      '/images/service-glass.jpg',
+    ]);
+    const home = (await appAt('/')).nativeElement as HTMLElement;
+    expect(home.querySelectorAll('.bento .tile:not(.tile-all)')).toHaveLength(6);
+  });
+
+  it('says a page is unavailable when the backend cannot be reached', async () => {
+    pages.failing = true;
+
+    const root = (await appAt('/par-mums')).nativeElement as HTMLElement;
+
+    expect(root.querySelector('main')?.textContent).toContain('Lapa šobrīd nav pieejama');
+    expect(root.querySelector('main a[href="tel:+37128803119"]')).not.toBeNull();
+    expect(document.title).toBe('XenonFix - auto priekšējo lukturu remonts Rīgā');
   });
 
   it('links to the privacy policy from the footer', async () => {

@@ -2,7 +2,7 @@ import { Component, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { I18n } from '../i18n/i18n';
 import { LocalizedPipe } from '../i18n/localized-link.pipe';
-import { SITE_INFO } from '../site-info';
+import { SiteInfo } from '../pages/site-info';
 import { ProductCard } from './product-card';
 import { StoreProductPage } from './store-api';
 
@@ -42,11 +42,11 @@ import { StoreProductPage } from './store-api';
           }
         } @else {
           <p class="lead">{{ t('store.empty') }}</p>
-          <a class="button" [href]="info.phoneHref">{{ t('cta.call') }} {{ info.phone }}</a>
+          <a class="button" [href]="info().phoneHref">{{ t('cta.call') }} {{ info().phone }}</a>
         }
       } @else {
         <p class="lead" role="alert">{{ t('store.unavailable') }}</p>
-        <a class="button" [href]="info.phoneHref">{{ t('cta.call') }} {{ info.phone }}</a>
+        <a class="button" [href]="info().phoneHref">{{ t('cta.call') }} {{ info().phone }}</a>
       }
     </div>
   `,
@@ -69,7 +69,7 @@ import { StoreProductPage } from './store-api';
 })
 export class StoreList {
   protected readonly t = inject(I18n).t;
-  protected readonly info = SITE_INFO;
+  protected readonly info = inject(SiteInfo).details;
 
   /** From the route's resolver (see withComponentInputBinding); null if the backend did not answer. */
   readonly result = input<StoreProductPage | null>(null);

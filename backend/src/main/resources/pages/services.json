@@ -1,0 +1,204 @@
+{
+  "seo": {
+    "title": {
+      "lv": "Mūsu pakalpojumi - XenonFix",
+      "ru": "Наши услуги - XenonFix",
+      "en": "Our services - XenonFix"
+    },
+    "description": {
+      "lv": "Lukturu korpusu, stiklu un reflektoru nomaiņa, LED remonts, pulēšana, regulēšana, diagnostika un UK stara pārbūve uz EU Rīgā.",
+      "ru": "Замена корпусов, стёкол и отражателей фар, ремонт LED, полировка, регулировка, диагностика и переделка светового пучка с UK на EU в Риге.",
+      "en": "Headlight housing, lens and reflector replacement, LED repair, polishing, adjustment, diagnostics and UK to EU beam conversion in Riga."
+    }
+  },
+  "eyebrow": {
+    "lv": "Ko mēs darām",
+    "ru": "Что мы делаем",
+    "en": "What we do"
+  },
+  "heading": {
+    "lv": "Mūsu pakalpojumi",
+    "ru": "Наши услуги",
+    "en": "Our services"
+  },
+  "lead": {
+    "lv": "Veiktajiem darbiem un luktura stiklam dodam 2 gadu garantiju.",
+    "ru": "На выполненные работы и стекло фары мы даём гарантию 2 года.",
+    "en": "We give a 2-year warranty on the work done and on the headlight lens."
+  },
+  "services": [
+    {
+      "title": {
+        "lv": "Lukturu korpusu nomaiņa",
+        "ru": "Замена корпусов фар",
+        "en": "Headlight housing replacement"
+      },
+      "text": {
+        "lv": "Bojāts luktura korpuss var ietekmēt luktura funkcionalitāti un izturību. Korpusa nomaiņa atjauno luktura struktūru un aizsardzību pret apkārtējās vides ietekmi. Atkarībā no bojājumiem varam restaurēt Jūsu esošo korpusu.",
+        "ru": "Повреждённый корпус может повлиять на работу и прочность фары. Замена корпуса восстанавливает конструкцию фары и защиту от воздействия окружающей среды. В зависимости от повреждений мы можем отреставрировать ваш существующий корпус.",
+        "en": "A damaged housing can affect how well a headlight works and how long it lasts. Replacing the housing restores the headlight’s structure and its protection from the environment. Depending on the damage, we can restore your existing housing."
+      }
+    },
+    {
+      "title": {
+        "lv": "Lukturu stikla nomaiņa",
+        "ru": "Замена стекла фары",
+        "en": "Headlight lens replacement"
+      },
+      "text": {
+        "lv": "Saplaisājis vai bojāts luktura stikls var samazināt gaismas kvalitāti un ļaut iekļūt netīrumiem vai mitrumam. Stikla nomaiņa nodrošina luktura efektivitāti un aizsardzību.",
+        "ru": "Треснувшее или повреждённое стекло фары может ухудшить качество света и пропускать внутрь грязь или влагу. Замена стекла обеспечивает эффективность и защиту фары.",
+        "en": "A cracked or damaged lens can reduce light quality and let in dirt or moisture. Replacing the lens keeps the headlight effective and protected."
+      }
+    },
+    {
+      "title": {
+        "lv": "Lukturu reflektoru nomaiņa",
+        "ru": "Замена отражателей фар",
+        "en": "Headlight reflector replacement"
+      },
+      "text": {
+        "lv": "Nolietoti vai bojāti reflektori samazina gaismas atstarošanu un izplatīšanu. Reflektoru nomaiņa nodrošina, ka lukturi efektīvi apgaismo ceļu.",
+        "ru": "Изношенные или повреждённые отражатели хуже отражают и распределяют свет. Замена отражателей обеспечивает эффективное освещение дороги.",
+        "en": "Worn or damaged reflectors reflect and spread less light. Replacing the reflectors makes sure the headlights light up the road effectively."
+      }
+    },
+    {
+      "title": {
+        "lv": "Lukturu lēcu tīrīšana",
+        "ru": "Чистка линз фар",
+        "en": "Projector lens cleaning"
+      },
+      "text": {
+        "lv": "Uz lukturu lēcām var uzkrāties netīrumi vai smalkas daļiņas, kas samazina gaismas intensitāti. Lēcu tīrīšana nodrošina skaidru gaismas izstarošanu.",
+        "ru": "На линзах фар может скапливаться грязь или мелкие частицы, снижающие интенсивность света. Чистка линз обеспечивает чёткое излучение света.",
+        "en": "Dirt or fine particles can build up on the projector lenses and reduce light output. Cleaning the lenses gives a clear beam of light."
+      }
+    },
+    {
+      "title": {
+        "lv": "LED remonts",
+        "ru": "Ремонт LED",
+        "en": "LED repair"
+      },
+      "text": {
+        "lv": "LED lukturiem var rasties problēmas ar diodēm vai vadības bloku. Šis pakalpojums ietver LED komponentu remontu vai nomaiņu, lai atjaunotu lukturu darbību.",
+        "ru": "В светодиодных фарах могут возникать проблемы с диодами или блоком управления. Эта услуга включает ремонт или замену компонентов LED для восстановления работы фар.",
+        "en": "LED headlights can have problems with the diodes or the control unit. This service covers repairing or replacing LED components to get the headlights working again."
+      }
+    },
+    {
+      "title": {
+        "lv": "Spuldžu nomaiņa",
+        "ru": "Замена ламп",
+        "en": "Bulb replacement"
+      },
+      "text": {
+        "lv": "Nolietojušās spuldzes vai neatbilstošas jaudas spuldzes var radīt vāju apgaismojumu. Spuldžu nomaiņa nodrošina, ka lukturi darbojas optimālā režīmā.",
+        "ru": "Изношенные лампы или лампы неподходящей мощности могут давать слабое освещение. Замена ламп обеспечивает работу фар в оптимальном режиме.",
+        "en": "Worn bulbs, or bulbs of the wrong power, can give weak lighting. Replacing the bulbs makes sure the headlights work at their best."
+      }
+    },
+    {
+      "title": {
+        "lv": "Lukturu regulēšana",
+        "ru": "Регулировка фар",
+        "en": "Headlight adjustment"
+      },
+      "text": {
+        "lv": "Nepareizi noregulēti lukturi var apžilbināt citus autovadītājus vai nodrošināt nepietiekamu apgaismojumu. Regulēšana nodrošina, ka lukturi precīzi apgaismo ceļu atbilstoši drošības standartiem.",
+        "ru": "Неправильно отрегулированные фары могут ослеплять других водителей или давать недостаточное освещение. Регулировка обеспечивает точное освещение дороги в соответствии со стандартами безопасности.",
+        "en": "Badly adjusted headlights can dazzle other drivers or give too little light. Adjustment makes sure the headlights light up the road precisely, in line with safety standards."
+      }
+    },
+    {
+      "title": {
+        "lv": "Vāja apgaismojuma diagnostika",
+        "ru": "Диагностика слабого освещения",
+        "en": "Weak lighting diagnostics"
+      },
+      "text": {
+        "lv": "Šis pakalpojums palīdz noteikt, kāpēc lukturi rada nepietiekamu gaismu, identificējot iespējamos cēloņus, piemēram, bojātas spuldzes, reflektorus vai elektriskās problēmas.",
+        "ru": "Эта услуга помогает определить, почему фары светят недостаточно ярко, выявляя возможные причины, например, повреждённые лампы, отражатели или электрические неисправности.",
+        "en": "This service helps find out why headlights give too little light by identifying possible causes, such as damaged bulbs or reflectors, or electrical problems."
+      }
+    },
+    {
+      "title": {
+        "lv": "Priekšējo lukturu blīvējuma pārbaude",
+        "ru": "Проверка герметизации передних фар",
+        "en": "Headlight seal inspection"
+      },
+      "text": {
+        "lv": "Laika gaitā lukturu blīvējumi var sabojāties, ļaujot iekļūt mitrumam, kas izraisa kondensāciju. Blīvējuma pārbaude novērš iespējamās problēmas un saglabā luktura efektivitāti.",
+        "ru": "Со временем уплотнения фар могут повреждаться, пропуская влагу, которая вызывает конденсат. Проверка герметизации предотвращает возможные проблемы и сохраняет эффективность фары.",
+        "en": "Over time, headlight seals can deteriorate and let in moisture, which causes condensation. A seal inspection prevents possible problems and keeps the headlight effective."
+      }
+    },
+    {
+      "title": {
+        "lv": "Bloku un vadu nomaiņa",
+        "ru": "Замена блоков и проводки",
+        "en": "Control unit and wiring replacement"
+      },
+      "text": {
+        "lv": "Elektriskās sistēmas bojājumi var izraisīt lukturu darbības traucējumus. Bojāto bloku un vadu nomaiņa nodrošina stabilu lukturu darbību.",
+        "ru": "Неисправности электрической системы могут нарушать работу фар. Замена повреждённых блоков и проводов обеспечивает стабильную работу фар.",
+        "en": "Faults in the electrical system can disrupt how headlights work. Replacing damaged control units and wiring makes sure the headlights work reliably."
+      }
+    },
+    {
+      "title": {
+        "lv": "Lukturu pulēšana",
+        "ru": "Полировка фар",
+        "en": "Headlight polishing"
+      },
+      "text": {
+        "lv": "Laika gaitā lukturu virsma var kļūt duļķaina vai saskrāpēta, samazinot gaismas intensitāti. Pulēšana atjauno lukturu caurspīdīgumu, uzlabojot gaismas caurlaidību un izskatu.",
+        "ru": "Со временем поверхность фар может стать мутной или поцарапанной, что снижает интенсивность света. Полировка восстанавливает прозрачность фар, улучшая светопропускание и внешний вид.",
+        "en": "Over time, the headlight surface can become cloudy or scratched, reducing light output. Polishing restores clarity, improving both light transmission and appearance."
+      }
+    },
+    {
+      "title": {
+        "lv": "Dienas gaitas lukturu remonts",
+        "ru": "Ремонт дневных ходовых огней",
+        "en": "Daytime running light repair"
+      },
+      "text": {
+        "lv": "Dienas gaitas lukturiem var rasties elektriskas vai fiziskas problēmas, kas ietekmē to darbību. Remonts atjauno to funkcionēšanu, uzlabojot redzamību dienas laikā.",
+        "ru": "В дневных ходовых огнях могут возникать электрические или физические неисправности, влияющие на их работу. Ремонт восстанавливает их работу и улучшает видимость в дневное время.",
+        "en": "Daytime running lights can develop electrical or physical faults that affect how they work. Repair gets them working again, improving visibility during the day."
+      }
+    },
+    {
+      "title": {
+        "lv": "UK stara pārbūve uz EU",
+        "ru": "Переделка светового пучка с UK на EU",
+        "en": "UK to EU beam conversion"
+      },
+      "text": {
+        "lv": "Transportlīdzekļiem no Lielbritānijas ir atšķirīgs gaismas stara leņķis. Šis pakalpojums pielāgo lukturu staru Eiropas ceļu prasībām, nodrošinot drošību un atbilstību regulām.",
+        "ru": "У транспортных средств из Великобритании другой угол светового пучка. Эта услуга приводит световой пучок фар в соответствие с требованиями европейских дорог, обеспечивая безопасность и соответствие правилам.",
+        "en": "Vehicles from the United Kingdom have a different light beam angle. This service adapts the headlight beam to the requirements of European roads, ensuring safety and compliance with regulations."
+      }
+    },
+    {
+      "title": {
+        "lv": "Lukturu tīrīšana no iekšpuses",
+        "ru": "Чистка фар изнутри",
+        "en": "Cleaning headlights from the inside"
+      },
+      "text": {
+        "lv": "Lukturu iekšpusē var uzkrāties putekļi, netīrumi vai mitrums, kas pasliktina gaismas kvalitāti. Tīrīšana no iekšpuses novērš šos traucējumus, uzlabojot gaismas staru.",
+        "ru": "Внутри фар может скапливаться пыль, грязь или влага, ухудшающие качество света. Чистка изнутри устраняет эти помехи и улучшает световой пучок.",
+        "en": "Dust, dirt or moisture can build up inside headlights and reduce light quality. Cleaning from the inside removes these problems and improves the light beam."
+      }
+    }
+  ],
+  "warrantyLink": {
+    "lv": "Garantijas nosacījumi",
+    "ru": "Условия гарантии",
+    "en": "Warranty terms"
+  }
+}

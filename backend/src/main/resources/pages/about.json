@@ -1,0 +1,90 @@
+{
+  "seo": {
+    "title": {
+      "lv": "Par mums - XenonFix",
+      "ru": "О нас - XenonFix",
+      "en": "About us - XenonFix"
+    },
+    "description": {
+      "lv": "XenonFix: auto lukturu remonta pieredze jau 10 gadi, no motociklu līdz smago mašīnu lukturiem. Pilna atbildība par darbu un augsta kvalitāte.",
+      "ru": "XenonFix: опыт ремонта автомобильных фар — уже 10 лет, от мотоциклетных фар до фар грузовиков. Полная ответственность за работу и высокое качество.",
+      "en": "XenonFix: 10 years of experience in headlight repair, from motorcycles to heavy trucks. Full responsibility for our work and high quality."
+    }
+  },
+  "heading": {
+    "lv": "Par mums",
+    "ru": "О нас",
+    "en": "About us"
+  },
+  "lead": {
+    "lv": "Auto lukturu remonta pieredze jau 10 gadi.",
+    "ru": "Опыт ремонта автомобильных фар — уже 10 лет.",
+    "en": "10 years of experience in car headlight repair."
+  },
+  "points": [
+    {
+      "lv": "Mūsu pieredze ietver plašu auto lukturu remontu klāstu – no motociklu lukturiem līdz autobusu un smago mašīnu lukturiem.",
+      "ru": "Наш опыт охватывает широкий спектр ремонта автомобильных фар — от мотоциклетных фар до фар автобусов и грузовиков.",
+      "en": "Our experience covers a wide range of headlight repairs, from motorcycle headlights to those of buses and heavy trucks."
+    },
+    {
+      "lv": "Mēs paši uzņemamies pilnu atbildību par mūsu darbu un garantējam augstu kvalitāti, pievēršot lielu rūpību klientu īpašumam.",
+      "ru": "Мы сами несём полную ответственность за свою работу и гарантируем высокое качество, бережно относясь к имуществу клиентов.",
+      "en": "We take full responsibility for our work and guarantee high quality, treating our customers’ property with great care."
+    },
+    {
+      "lv": "Pirms remonta sākuma vienmēr brīdinām par iespējamām problēmsituācijām, lai izvairītos no nepatīkamiem pārsteigumiem.",
+      "ru": "Перед началом ремонта мы всегда предупреждаем о возможных проблемах, чтобы избежать неприятных сюрпризов.",
+      "en": "Before starting a repair, we always warn you about possible problems, to avoid unpleasant surprises."
+    },
+    {
+      "lv": "Saskaņojam luktura defektācijas lapu ar klientu un rūpīgi izskaidrojam, kādi darbi tikuši veikti.",
+      "ru": "Мы согласовываем с клиентом дефектовочный лист фары и подробно объясняем, какие работы были выполнены.",
+      "en": "We go through the headlight’s defect report with you and carefully explain what work has been done."
+    }
+  ],
+  "goalHeading": {
+    "lv": "Mūsu mērķis",
+    "ru": "Наша цель",
+    "en": "Our goal"
+  },
+  "goal": [
+    {
+      "lv": "Braukšana pa tumšiem ceļiem ar mums vairs nesagādās raizes. Mūsu mērķis ir uzlabot satiksmes drošību, paaugstinot lukturu gaismas intensitāti. Daudzi cilvēki, nezinot par remonta iespējām, lieki tērē naudu, iegādājoties dārgus oriģinālos vai nekvalitatīvus lētus analogos lukturus.",
+      "ru": "С нами поездки по тёмным дорогам больше не будут доставлять беспокойства. Наша цель — повысить безопасность дорожного движения, увеличив интенсивность света фар. Многие люди, не зная о возможностях ремонта, напрасно тратят деньги на дорогие оригинальные или некачественные дешёвые аналоговые фары.",
+      "en": "With us, driving on dark roads will no longer be a worry. Our goal is to improve road safety by increasing the light output of headlights. Many people, unaware that repair is possible, needlessly spend money on expensive original headlights or on cheap, poor-quality copies."
+    },
+    {
+      "lv": "Mēs piedāvājam individuāli pielāgotus risinājumus, veidojot arī sarežģītus projektus atbilstoši klientu vajadzībām. Ja vēlaties uzlabot savu drošību un padarīt savu auto unikālu, mēs ar prieku palīdzēsim īstenot Jūsu ieceri!",
+      "ru": "Мы предлагаем индивидуальные решения и создаём в том числе сложные проекты в соответствии с потребностями клиентов. Если вы хотите повысить свою безопасность и сделать свой автомобиль уникальным, мы с радостью поможем воплотить вашу идею!",
+      "en": "We offer individually tailored solutions, and also take on complex projects to meet our customers’ needs. If you want to improve your safety and make your car unique, we would be glad to help bring your idea to life!"
+    }
+  ],
+  "managerImage": {
+    "src": "/images/ugis-zvingulis.jpg",
+    "width": 640,
+    "height": 960
+  },
+  "managerName": {
+    "lv": "Uģis Zvingulis",
+    "ru": "Угис Звингулис",
+    "en": "Uģis Zvingulis"
+  },
+  "managerRole": {
+    "lv": "Uzņēmuma vadītājs",
+    "ru": "Руководитель компании",
+    "en": "Company manager"
+  },
+  "manager": [
+    {
+      "lv": "Uģis ir auto lukturu remonta speciālists ar 10 gadu pieredzi šajā nozarē. Jau no bērnības viņš bija saistīts ar automašīnām – tēva garāžā skrūvējot savas un draugu automašīnas. Tieši šeit viņš iemantoja dziļu interesi par automašīnām, kas ar laiku aizveda pie auto lukturu remonta.",
+      "ru": "Угис — специалист по ремонту автомобильных фар с 10-летним опытом работы в этой области. С детства он был связан с автомобилями, ремонтируя в гараже отца свои машины и машины друзей. Именно там у него появился глубокий интерес к автомобилям, который со временем привёл его к ремонту автомобильных фар.",
+      "en": "Uģis is a headlight repair specialist with 10 years of experience in the field. He has been around cars since childhood, working on his own and his friends’ cars in his father’s garage. This is where he developed the deep interest in cars that eventually led him to headlight repair."
+    },
+    {
+      "lv": "Viņa pieeju darbam raksturo augsta precizitāte, punktualitāte un uzmanība pret katru detaļu. Uģis izceļas ar spēju sīki izanalizēt katru remonta procesu, nodrošinot, ka katrs klients saņem augstākās kvalitātes pakalpojumu. Viņam ir izteikta atbildības sajūta, un viņa mērķis ir padarīt katru klientu laimīgāku.",
+      "ru": "Его подход к работе отличают высокая точность, пунктуальность и внимание к каждой детали. Угис умеет подробно анализировать каждый процесс ремонта, чтобы каждый клиент получал услугу высочайшего качества. Ему присуще сильное чувство ответственности, а его цель — сделать каждого клиента счастливее.",
+      "en": "His approach to work is defined by high precision, punctuality and attention to every detail. Uģis stands out for his ability to analyse each repair process closely, making sure every customer receives the highest quality of service. He has a strong sense of responsibility, and his goal is to make every customer happier."
+    }
+  ]
+}

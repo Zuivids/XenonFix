@@ -7,6 +7,8 @@ import { routes } from '../app.routes';
 import { of } from 'rxjs';
 import { vi } from 'vitest';
 import { SeoTitleStrategy } from '../seo/seo-title-strategy';
+import { PageApi } from '../pages/page-api';
+import { stubPageApi } from '../pages/testing/starting-pages';
 import { StoreApi } from '../store/store-api';
 import { Me } from './admin-api';
 import { sessionExpiredInterceptor } from './session-expired.interceptor';
@@ -33,6 +35,7 @@ describe('Admin panel', () => {
         { provide: TitleStrategy, useClass: SeoTitleStrategy },
         // For the public pages some of these tests pass through
         { provide: StoreApi, useValue: { list: () => of({ items: [], page: 0, totalPages: 0 }) } },
+        { provide: PageApi, useValue: stubPageApi() },
       ],
     });
     http = TestBed.inject(HttpTestingController);

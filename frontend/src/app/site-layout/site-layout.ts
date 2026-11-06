@@ -4,7 +4,7 @@ import { I18n } from '../i18n/i18n';
 import { LanguageSwitcher } from '../i18n/language-switcher';
 import { LocalizedPipe } from '../i18n/localized-link.pipe';
 import { MessageKey } from '../i18n/messages.lv';
-import { SITE_INFO } from '../site-info';
+import { SiteInfo } from '../pages/site-info';
 
 const NAV_LINKS: { path: string; label: MessageKey; exact: boolean }[] = [
   { path: '/', label: 'nav.home', exact: true },
@@ -30,7 +30,7 @@ const TERMS_LINKS: { path: string; label: MessageKey }[] = [
 })
 export class SiteLayout {
   protected readonly t = inject(I18n).t;
-  protected readonly info = SITE_INFO;
+  protected readonly info = inject(SiteInfo).details;
   protected readonly navLinks = NAV_LINKS;
   protected readonly termsLinks = TERMS_LINKS;
   protected readonly year = new Date().getFullYear();
