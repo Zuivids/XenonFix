@@ -45,7 +45,7 @@ const EVENT_NAMES: Record<string, string> = {
     }
     @if (log(); as log) {
       <div class="table-scroll">
-        <table>
+        <table class="cards">
           <thead>
             <tr>
               <th>Laiks</th>
@@ -58,11 +58,11 @@ const EVENT_NAMES: Record<string, string> = {
           <tbody>
             @for (entry of log.items; track $index) {
               <tr>
-                <td>{{ entry.occurredAt | date: 'dd.MM.yyyy HH:mm:ss' }}</td>
-                <td>{{ eventName(entry.eventType) }}</td>
-                <td>{{ entry.adminEmail ?? '—' }}</td>
-                <td>{{ entry.details ?? '—' }}</td>
-                <td>{{ entry.ipAddress ?? '—' }}</td>
+                <td data-label="Laiks">{{ entry.occurredAt | date: 'dd.MM.yyyy HH:mm:ss' }}</td>
+                <td data-label="Notikums">{{ eventName(entry.eventType) }}</td>
+                <td data-label="Administrators">{{ entry.adminEmail ?? '—' }}</td>
+                <td data-label="Papildu informācija">{{ entry.details ?? '—' }}</td>
+                <td data-label="IP adrese">{{ entry.ipAddress ?? '—' }}</td>
               </tr>
             }
           </tbody>

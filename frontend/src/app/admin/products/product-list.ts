@@ -39,7 +39,7 @@ import { ProductApi, ProductPage, ProductStatus, STATUS_NAMES } from './product-
     @if (products(); as products) {
       @if (products.items.length) {
         <div class="table-scroll">
-          <table>
+          <table class="cards">
             <thead>
               <tr>
                 <th></th>
@@ -60,9 +60,9 @@ import { ProductApi, ProductPage, ProductStatus, STATUS_NAMES } from './product-
                       <span class="no-photo">Nav foto</span>
                     }
                   </td>
-                  <td><a [routerLink]="['/admin/products', product.id]">{{ product.name }}</a></td>
-                  <td>{{ product.partNumber ?? '—' }}</td>
-                  <td class="nowrap">
+                  <td data-label="Nosaukums"><a [routerLink]="['/admin/products', product.id]">{{ product.name }}</a></td>
+                  <td data-label="Detaļas numurs">{{ product.partNumber ?? '—' }}</td>
+                  <td data-label="Cena" class="nowrap">
                     @if (product.salePrice !== null) {
                       <s>{{ product.price | number: '1.2-2' }} €</s>
                       {{ product.salePrice | number: '1.2-2' }} €
@@ -70,8 +70,8 @@ import { ProductApi, ProductPage, ProductStatus, STATUS_NAMES } from './product-
                       {{ product.price | number: '1.2-2' }} €
                     }
                   </td>
-                  <td [class.out-of-stock]="product.stockQuantity === 0">{{ product.stockQuantity }}</td>
-                  <td>{{ statusNames[product.status] }}</td>
+                  <td data-label="Atlikums" [class.out-of-stock]="product.stockQuantity === 0">{{ product.stockQuantity }}</td>
+                  <td data-label="Statuss">{{ statusNames[product.status] }}</td>
                 </tr>
               }
             </tbody>

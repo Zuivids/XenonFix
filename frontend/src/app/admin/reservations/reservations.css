@@ -120,3 +120,12 @@ form.note .actions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+@media (max-width: 39.99rem) {
+  /* As cards, the whole waiting reservation stands out, not each line */
+  tr.waiting {
+    padding-inline: 0.5rem;
+    border-radius: 6px;
+    background: #eef1fe;
+  }
+}

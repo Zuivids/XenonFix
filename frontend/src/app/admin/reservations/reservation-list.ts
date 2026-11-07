@@ -38,7 +38,7 @@ import { RESERVATION_STATUS_NAMES, ReservationApi, ReservationPage, ReservationS
     @if (reservations(); as reservations) {
       @if (reservations.items.length) {
         <div class="table-scroll">
-          <table>
+          <table class="cards">
             <thead>
               <tr>
                 <th>Numurs</th>
@@ -54,20 +54,20 @@ import { RESERVATION_STATUS_NAMES, ReservationApi, ReservationPage, ReservationS
             <tbody>
               @for (reservation of reservations.items; track reservation.id) {
                 <tr [class.waiting]="reservation.status === 'PENDING'">
-                  <td class="nowrap">
+                  <td data-label="Numurs" class="nowrap">
                     <a [routerLink]="['/admin/reservations', reservation.id]">{{ reservation.reference }}</a>
                   </td>
-                  <td class="nowrap">{{ reservation.createdAt | date: 'dd.MM.yyyy HH:mm' }}</td>
-                  <td>{{ reservation.productName }}</td>
-                  <td>{{ reservation.quantity }}</td>
-                  <td class="nowrap">{{ reservation.total | number: '1.2-2' }} €</td>
+                  <td data-label="Datums" class="nowrap">{{ reservation.createdAt | date: 'dd.MM.yyyy HH:mm' }}</td>
+                  <td data-label="Produkts">{{ reservation.productName }}</td>
+                  <td data-label="Daudzums">{{ reservation.quantity }}</td>
+                  <td data-label="Kopā" class="nowrap">{{ reservation.total | number: '1.2-2' }} €</td>
                   @if (reservation.anonymized) {
-                    <td class="erased" colspan="2">Dati dzēsti</td>
+                    <td data-label="Klients" class="erased" colspan="2">Dati dzēsti</td>
                   } @else {
-                    <td>{{ reservation.customerName }}</td>
-                    <td class="nowrap">{{ reservation.customerPhone }}</td>
+                    <td data-label="Klients">{{ reservation.customerName }}</td>
+                    <td data-label="Telefons" class="nowrap">{{ reservation.customerPhone }}</td>
                   }
-                  <td class="nowrap">
+                  <td data-label="Statuss" class="nowrap">
                     <span [class]="'status status-' + reservation.status">{{ statusNames[reservation.status] }}</span>
                   </td>
                 </tr>

@@ -17,7 +17,7 @@ const MIN_PASSWORD_LENGTH = 12;
       <p class="error" role="alert">{{ message }}</p>
     }
     <div class="table-scroll">
-      <table>
+      <table class="cards">
         <thead>
           <tr>
             <th>Vārds</th>
@@ -31,12 +31,12 @@ const MIN_PASSWORD_LENGTH = 12;
         <tbody>
           @for (admin of admins(); track admin.id) {
             <tr>
-              <td>{{ admin.displayName }}</td>
-              <td>{{ admin.email }}</td>
-              <td>{{ statusText(admin) }}</td>
-              <td>{{ admin.mfaEnabled ? 'Iestatīta' : 'Vēl nav' }}</td>
-              <td>{{ admin.lastLoginAt ? (admin.lastLoginAt | date: 'dd.MM.yyyy HH:mm') : '—' }}</td>
-              <td>
+              <td data-label="Vārds">{{ admin.displayName }}</td>
+              <td data-label="E-pasts">{{ admin.email }}</td>
+              <td data-label="Statuss">{{ statusText(admin) }}</td>
+              <td data-label="Lietotne">{{ admin.mfaEnabled ? 'Iestatīta' : 'Vēl nav' }}</td>
+              <td data-label="Pēdējā pieslēgšanās">{{ admin.lastLoginAt ? (admin.lastLoginAt | date: 'dd.MM.yyyy HH:mm') : '—' }}</td>
+              <td data-label="Darbības">
                 @if (admin.id === session.me()?.id) {
                   Jūs
                 } @else {

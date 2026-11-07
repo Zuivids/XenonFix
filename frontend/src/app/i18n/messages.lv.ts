@@ -23,7 +23,7 @@ export const lv = {
     'Auto priekšējo lukturu remonts Rīgā: stiklu un reflektoru maiņa, korpusa un vadu remonts, stikla atjaunošana, gaismas stara pārbūve. 10 gadu pieredze un 2 gadu garantija.',
   'works.close': 'Aizvērt',
   'contact.map': 'Atvērt kartē',
-  'contact.navigate': 'Atvērt navigāciju',
+  'contact.navigate': 'Atvērt Waze',
   'payment.title': 'Apmaksas nosacījumi - XenonFix',
   'payment.description': 'Apmaksa ar pārskaitījumu, bankas karti, skaidrā naudā vai sadalot 3 maksājumos ar ESTO.',
   'payment.heading': 'Apmaksas nosacījumi',

@@ -84,3 +84,39 @@ th {
   flex-wrap: wrap;
   gap: 0.5rem;
 }
+
+/*
+ * On a phone, a table with class "cards" shows each row as a block, with the column name before
+ * each value (data-label on each cell), rather than columns that need scrolling sideways.
+ */
+@media (max-width: 39.99rem) {
+  table.cards thead {
+    display: none;
+  }
+
+  table.cards,
+  table.cards tbody,
+  table.cards tr {
+    display: block;
+  }
+
+  table.cards tr {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #ddd;
+  }
+
+  table.cards td {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.1875rem 0;
+    border: 0;
+    overflow-wrap: anywhere;
+  }
+
+  table.cards td[data-label]::before {
+    content: attr(data-label);
+    flex: 0 0 7.5rem;
+    color: #666;
+    font-weight: 600;
+  }
+}
