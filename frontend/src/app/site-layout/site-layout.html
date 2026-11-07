@@ -88,8 +88,27 @@
       </ul>
     </div>
   </div>
-  <p class="container copyright">
-    © {{ year }} {{ info().companyName }} ·
-    <a [routerLink]="'/privatuma-politika' | localized">{{ t('privacy.heading') }}</a>
-  </p>
+  <div class="container footer-bottom">
+    <p class="copyright">
+      © {{ year }} {{ info().companyName }} ·
+      <a [routerLink]="'/privatuma-politika' | localized">{{ t('privacy.heading') }}</a>
+    </p>
+    <a
+      class="made-by"
+      href="https://www.linkedin.com/in/m%C4%81rti%C5%86%C5%A1-%C5%BEaimis-0a9b21394"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {{ t('footer.madeBy') }}
+      <!-- Only this part lights up and grows on hover -->
+      <span class="made-by-name">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="13" height="13" aria-hidden="true">
+          <path
+            d="M17 2H3a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1ZM6.94 15.5H4.56V8h2.38v7.5ZM5.75 6.965a1.378 1.378 0 1 1 0-2.756 1.378 1.378 0 0 1 0 2.756ZM15.5 15.5h-2.38v-3.647c0-.87-.016-1.988-1.212-1.988-1.213 0-1.399.948-1.399 1.927V15.5H8.13V8h2.284v1.023h.031c.318-.602 1.094-1.236 2.252-1.236 2.41 0 2.854 1.587 2.854 3.648L15.5 15.5Z"
+          />
+        </svg>
+        Mārtiņš Žaimis
+      </span>
+    </a>
+  </div>
 </footer>

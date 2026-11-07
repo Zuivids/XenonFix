@@ -16,6 +16,7 @@ export const en: Messages = {
   'footer.registration': 'Reg. No.',
   'footer.vat': 'VAT Reg. No.',
   'footer.account': 'Account',
+  'footer.madeBy': 'Made by',
   'cta.call': 'Call',
   'cta.whatsapp': 'Message on WhatsApp',
   'home.title': 'XenonFix - car headlight repair in Riga',

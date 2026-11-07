@@ -16,6 +16,7 @@ export const ru: Messages = {
   'footer.registration': 'Рег. №',
   'footer.vat': 'Рег. № НДС',
   'footer.account': 'Счёт',
+  'footer.madeBy': 'Разработал',
   'cta.call': 'Позвонить',
   'cta.whatsapp': 'Написать в WhatsApp',
   'home.title': 'XenonFix - ремонт передних автомобильных фар в Риге',

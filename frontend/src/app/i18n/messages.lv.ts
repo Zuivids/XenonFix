@@ -16,6 +16,7 @@ export const lv = {
   'footer.registration': 'Reģ. Nr.',
   'footer.vat': 'PVN Reģ. Nr.',
   'footer.account': 'Konts',
+  'footer.madeBy': 'Izstrādāja',
   'cta.call': 'Zvanīt',
   'cta.whatsapp': 'Rakstīt WhatsApp',
   'home.title': 'XenonFix - auto priekšējo lukturu remonts Rīgā',
